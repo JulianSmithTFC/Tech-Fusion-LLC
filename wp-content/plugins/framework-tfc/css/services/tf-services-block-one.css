@@ -1,0 +1,46 @@
+/* Block One */
+.services-blockOne-container{
+    padding-top: 10px;
+    padding-bottom: 100px;
+    min-height: 800px;
+}
+.services-blockOne-containerLeft{
+    padding-right: 40px !important;
+    padding-top: 60px;
+}
+.services-blockOne-heading{
+    color: #020202;
+    font-weight: bolder;
+}
+.services-blockOne-headingOne{
+    font-size: 70px !important;
+    line-height: 84px;
+}
+/* Mobile Version */
+.services-blockOne-headingOne-mobile{
+    font-size: 50px !important;
+}
+.services-blockOne-headingTwo{
+    color: #74aff7 !important;
+}
+.services-blockOne-subheading{
+    color: #020202;
+    font-weight: bolder;
+    font-size: 25px;
+}
+.services-blockOne-button{
+    background-color: #75aef8 !important;
+    border-radius: 25px !important;
+    color: #fff !important;
+    font-weight: bolder !important;
+    font-size: 15px !important;
+}
+.services-blockOne-containerRight{
+    padding-top: 30px;
+}
+.services-blockOne-svgImage{
+    max-width: 670px;
+    max-height: 574px;
+    width: auto;
+    height: auto;
+}

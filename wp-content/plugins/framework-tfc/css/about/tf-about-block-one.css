@@ -1,0 +1,47 @@
+/* Block One */
+.about-blockOne-background{
+    background-image: url("https://techfusionconsulting.com/wp-content/uploads/2019/09/top-homepage-hexagon-fliped.png");
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-size: contain;
+    background-color: #fff;
+}
+.about-blockOne-container{
+    padding-top: 10px;
+    padding-bottom: 100px;
+    min-height: 800px;
+}
+.about-blockOne-containerLeft{
+    padding-right: 40px !important;
+    padding-top: 60px;
+}
+.about-blockOne-heading{
+    color: #020202;
+    font-weight: bolder;
+}
+.about-blockOne-headingOne{
+    font-size: 70px !important;
+    line-height: 84px;
+}
+/* Mobile Version */
+.about-blockOne-headingOne-mobile{
+    font-size: 50px !important;
+}
+.about-blockOne-headingTwo{
+    color: #74aff7 !important;
+}
+.about-blockOne-subheading{
+    color: #020202;
+    font-weight: bolder;
+    font-size: 25px;
+}
+.about-blockOne-button{
+    background-color: #75aef8 !important;
+    border-radius: 25px !important;
+    color: #fff !important;
+    font-weight: bolder !important;
+    font-size: 15px !important;
+}
+.about-blockOne-containerRight{
+    padding-top: 30px;
+}

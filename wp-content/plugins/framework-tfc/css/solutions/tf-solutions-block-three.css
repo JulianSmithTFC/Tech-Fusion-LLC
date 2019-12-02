@@ -1,0 +1,16 @@
+/* Block Three */
+.soulutions-blockThree-container{
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+.soulutions-blockThree-heading{
+    color: #000;
+    font-weight: bolder;
+    font-size: 35px;
+}
+.soulutions-blockThree-sideContainer{
+    margin: 10px 10px 10px 10px;
+}
+.soulutions-blockThree-logos{
+    max-height: 115px;
+}
