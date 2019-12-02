@@ -1,3 +1,2 @@
-wp-content/upgrade/
-wp-content/uploads/
-wp-content/plugins/hello.php
+wp-content/upgrade/*
+wp-content/uploads/*
