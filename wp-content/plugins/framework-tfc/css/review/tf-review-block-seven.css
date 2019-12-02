@@ -1,0 +1,40 @@
+/* Block Seven */
+.review-blockSeven-containerMain{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+.review-blockSeven-container{
+    background: #ffffff;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    padding-left: 35px;
+    padding-right: 35px;
+}
+.review-blockSeven-heading{
+    font-size: 30px !important;
+    font-weight: bolder;
+    text-align: center;
+}
+.review-blockSeven-containers{
+
+}
+.review-blockSeven-headings{
+    color: #74aff7;
+    font-weight: bold;
+    font-size: 25px !important;
+}
+.review-blockSeven-images{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.review-blockSeven-subheadings{
+    font-weight: bolder;
+    color: #000000;
+    margin-top: 20px;
+}
+.review-blockSeven-hrlines{
+    background: #000000 !important;
+    max-width: 900px !important;
+}

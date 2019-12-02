@@ -1,0 +1,31 @@
+/* Block Seven */
+.home-blockSeven-container{
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-size: cover;
+    min-height: 450px;
+}
+.home-blockSeven-heading{
+    color: #020202;
+    font-weight: bolder;
+}
+.home-blockSeven-heading-desktop{
+    font-size: 65px;
+}
+.home-blockSeven-heading-mobile{
+    font-size: 50px;
+}
+.home-blockSeven-desc{
+    color: #13417a;
+    font-size: 24px;
+    font-weight: bolder;
+}
+.home-blockSeven-button{
+    background-color: #74aff7 !important;
+    border-radius: 15px !important;
+    color: #fff !important;
+    font-weight: bolder !important;
+    font-size: 15px !important;
+}

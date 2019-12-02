@@ -1,0 +1,130 @@
+/* Block Seven */
+.subservices-blockSeven-container{
+    background-color: #f2f5f7;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+.subservices-blockSeven-heading{
+    font-weight: bolder !important;
+    color: #020202 !important;
+    font-size: 35px !important;
+}
+.subservices-blockSeven-bodyText{
+    max-width: 750px;
+    margin-bottom: 5px;
+}
+.subservices-blockSeven-containerLeft{
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+.subservices-blockSeven-containerRight{
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+.subservices-blockSeven-image{
+
+}
+.subservices-blockSeven-accordian{
+    background-color: #ffffff;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.subservices-blockSeven-accordianOne-shown{
+    border-left-color: #33959f;
+}
+.subservices-blockSeven-accordianTwo-shown{
+    border-left-color: #a8dae2;
+}
+.subservices-blockSeven-accordianThree-shown{
+    border-left-color: #f15035;
+}
+.subservices-blockSeven-accordianFour-shown{
+    border-left-color: #f9cf36;
+}
+.subservices-blockSeven-accordianFive-shown{
+    border-left-color: #a8dae2;
+}
+.subservices-blockSeven-accordianSix-shown{
+    border-left-color: #33959f;
+}
+
+.subservices-blockSeven-accordianContainer{
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#subservices-blockSeven-accordian-0:hover{
+    background-color: #ffffff;
+    border-left-color: #33959f;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+}
+#subservices-blockSeven-accordian-1:hover{
+    background-color: #ffffff;
+    border-left-color: #a8dae2;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+}
+#subservices-blockSeven-accordian-2:hover{
+    background-color: #ffffff;
+    border-left-color: #f15035;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+}
+#subservices-blockSeven-accordian-3:hover{
+    background-color: #ffffff;
+    border-left-color: #f9cf36;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+}
+#subservices-blockSeven-accordian-4:hover{
+    background-color: #ffffff;
+    border-left-color: #a8dae2;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+}
+#subservices-blockSeven-accordian-5:hover{
+    background-color: #ffffff;
+    border-left-color: #33959f;
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-radius: 10px;
+}
+
+.subservices-blockSeven-accordianHeading{
+    margin-left: 15px;
+    color: #000;
+    font-size: 22px;
+    margin-bottom: 0px !important;
+}
+
+.subservices-blockSeven-accordianBodyText{
+    margin-left: 15px;
+    color: #adadad;
+}
+.subservices-blockSeven-button{
+    background-color: #74aff7 !important;
+    font-weight: bolder !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    margin-top: 70px !important;
+}
