@@ -1,0 +1,29 @@
+/* Block Eleven */
+.review-blockEleven-container{
+    background: #74aff7;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    padding-left: 35px;
+    padding-right: 35px;
+}
+.review-blockEleven-heading{
+    color: #ffffff;
+    font-weight: bolder;
+    font-size: 28px !important;
+}
+.review-blockEleven-bodyText{
+    color: #ffffff;
+    font-size: 22px !important;
+}
+.review-blockEleven-button{
+    color: #74aff7 !important;
+    border: #74aff7 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    background: #ffff !important;
+    border-radius: 15px !important;
+    font-size: 20px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    font-weight: bolder !important;
+}

@@ -1,0 +1,30 @@
+/* Block Eight */
+.review-blockEight-containerMain{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+.review-blockEight-container{
+    background: #ffffff;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    padding-left: 35px;
+    padding-right: 35px;
+}
+.review-blockEight-heading{
+    text-align: center;
+    font-size: 30px !important;
+    font-weight: bolder;
+    color: #74aff7;
+}
+.review-blockEight-containerLeft{
+    padding-top: 20px;
+}
+.review-blockEight-containerRight{
+    padding-top: 40px;
+}
+.review-blockEight-image{
+
+}
+.review-blockEight-bodyText{
+
+}

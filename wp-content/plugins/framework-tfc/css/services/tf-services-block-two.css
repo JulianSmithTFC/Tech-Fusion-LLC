@@ -1,0 +1,30 @@
+/* Block Two */
+.services-blockTwo-container{
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background-color: #f2f5f7;
+}
+.services-blockTwo-container{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 175px;
+    padding-right: 175px;
+}
+.services-blockTwo-svgHex{
+    width: 200px;
+    height: 172px;
+}
+.services-blockTwo-hexText{
+    font-size: 35px;
+    fill: #d2efee;
+    text-anchor: middle;
+    font-family: Arial;
+}
+.services-blockTwo-middleText{
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+}
