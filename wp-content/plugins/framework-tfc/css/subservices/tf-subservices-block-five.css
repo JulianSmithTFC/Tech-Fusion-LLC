@@ -1,0 +1,16 @@
+/* Block Five */
+.subservices-blockFive-container{
+    background-color: #f2f5f7 !important;
+    padding-top: 5px;
+    padding-bottom: 30px;
+}
+.subservices-blockFive-button{
+    background-color: #74aff7 !important;
+    font-weight: bolder !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}

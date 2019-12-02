@@ -1,0 +1,48 @@
+/* Block One */
+.soulutions-blockOne-container{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+.soulutions-blockOne-containerTop{
+    padding-top: 50px;
+    padding-bottom: 30px;
+}
+.soulutions-blockOne-heading{
+    color: #020202;
+    font-weight: bolder;
+}
+.soulutions-blockOne-heading-desktop{
+    font-size: 65px !important;
+}
+.soulutions-blockOne-heading-mobile{
+    font-size: 40px !important;
+}
+.soulutions-blockOne-subheading{
+
+}
+.soulutions-blockOne-containerLeft{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.soulutions-blockOne-containerRight{
+
+}
+.soulutions-blockOne-serviceHeading{
+    color: #74AFF7;
+    font-weight: bolder;
+}
+.soulutions-blockOne-serviceDescription{
+
+}
+.soulutions-blockOne-buttons{
+    background-color: #f2f5f7 !important;
+    color: #74aff7 !important;
+    border-color: #74aff7 !important;
+    border-bottom-style: solid !important;
+    border-bottom-width: 3px !important;
+    font-weight: bolder !important;
+    font-size: 15px !important;
+}
+.soulutions-blockOne-images{
+    max-height: 400px;
+}

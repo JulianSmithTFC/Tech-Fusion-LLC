@@ -1,0 +1,27 @@
+/* Block One */
+.review-blockOne-container{
+    background: #74aff7;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.review-blockOne-containerLeft{
+
+}
+.review-blockOne-containerRight{
+
+}
+.review-blockOne-heading{
+    color: #ffffff;
+    font-weight: bolder;
+    font-size: 20px !important;
+}
+.review-blockOne-button{
+    color: #ffffff !important;
+    border: #ffffff !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    background: #74aff7 !important;
+    border-radius: 15px !important;
+    font-weight: bolder !important;
+    box-shadow: none !important;
+}
