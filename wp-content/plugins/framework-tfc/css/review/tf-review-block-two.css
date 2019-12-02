@@ -1,0 +1,42 @@
+/* Block Two */
+.review-blockTwo-heading{
+    font-size: 20px !important;
+    font-weight: bolder;
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+.review-blockTwo-container{
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-left: 35px;
+    padding-right: 35px;
+    font-weight: bolder;
+    font-size: 20px !important;
+    background: #ffffff;
+}
+.review-blockTwo-bodyText{
+    margin-bottom: 10px;
+    font-size: 25px !important;
+}
+.review-blockTwo-subheading{
+    text-decoration: underline;
+    font-style: italic;
+}
+.review-blockTwo-icon{
+    color: #e5ac00;
+}
+.review-blockTwo-video{
+    width: auto !important;
+    margin-bottom: 30px;
+}
+.review-blockTwo-button{
+    color: #74aff7 !important;
+    border: #74aff7 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    background: #ffff !important;
+    border-radius: 25px !important;
+    font-size: 16px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
