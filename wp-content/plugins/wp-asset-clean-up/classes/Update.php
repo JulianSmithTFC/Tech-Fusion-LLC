@@ -27,9 +27,9 @@ class Update
 	 * @var array
 	 */
 	public $frontEndUpdateFor = array(
-		'homepage' => false,
-		'page'     => false
-	);
+        'homepage' => false,
+        'page'     => false
+    );
 
 	/**
 	 * @var array
@@ -52,13 +52,13 @@ HTML;
 HTML;
 	}
 
-    /**
+	/**
      *
      */
     public function init()
     {
-	    // Triggers on front-end view
-	    add_action('init', array($this, 'triggersAfterInit'), 11);
+    	// Triggers on front-end view
+        add_action('init', array($this, 'triggersAfterInit'), 11);
 
         // After post/page is saved - update your styles/scripts lists
         // This triggers ONLY in the Dashboard after "Update" button is clicked (on Edit mode)
@@ -69,19 +69,18 @@ HTML;
 	 *
 	 */
 	public function triggersAfterInit()
-	{
-		if (! is_admin() && Main::instance()->frontendShow()) {
+    {
+	    if (! is_admin() && Main::instance()->frontendShow()) {
 		    if (! empty($_POST)) {
-			    add_action( 'wp', array( $this, 'frontendUpdate' ), 9 );
+			    add_action('wp', array($this, 'frontendUpdate'), 9);
 		    }
 
-			add_action( 'template_redirect', array( $this, 'redirectAfterFrontEndUpdate' ) );
-		}
-	}
+		    add_action('template_redirect', array($this, 'redirectAfterFrontEndUpdate'));
+	    }
+    }
 
     /**
-     * Priority: 9 (AFTER current post ID is correctly retrieved and BEFORE the data from the database is fetched)
-     * Form was submitted in the frontend view (not Dashboard) from a singular page, front-page etc.
+     *
      */
     public function frontendUpdate()
     {
@@ -97,8 +96,8 @@ HTML;
 
         $updateAction = Misc::getVar('post', 'wpacu_update_asset_frontend');
 
-	    if (! isset($_POST[$nonceName]) || $updateAction != 1 || ! Main::instance()->frontendShow()) {
-		    return;
+        if (! isset($_POST[$nonceName]) || $updateAction != 1 || ! Main::instance()->frontendShow()) {
+            return;
         }
 
         // only for admins
@@ -121,7 +120,7 @@ HTML;
         $this->frontEndUpdateTriggered = true;
 
         // Was the Assets List Layout changed?
-	    self::updateAssetListLayoutSettings();
+        self::updateAssetListLayoutSettings();
 
         // Form submitted from the homepage
 	    // e.g. from a page such as latest blog posts, not a static page that was selected as home page)
@@ -140,10 +139,10 @@ HTML;
             return;
         }
 
-        // Any preloads
-        Preloads::updatePreloads();
+	    // Any preloads
+	    Preloads::updatePreloads();
 
-	    // Any handle notes?
+        // Any handle notes?
 	    self::updateHandleNotes();
 
 	    // Any ignore deps
@@ -157,14 +156,13 @@ HTML;
 	 *
 	 */
 	public static function updateAssetListLayoutSettings()
-	{
-		// Was the Assets List Layout changed?
-		if ($assetsListLayout = Misc::getVar('post', 'wpacu_assets_list_layout')) {
-			$settingsClass = new Settings();
-			$settingsClass->updateOption('assets_list_layout', $assetsListLayout);
-		}
-	}
-
+    {
+	    // Was the Assets List Layout changed?
+	    if ($assetsListLayout = Misc::getVar('post', 'wpacu_assets_list_layout')) {
+		    $settingsClass = new Settings();
+		    $settingsClass->updateOption('assets_list_layout', $assetsListLayout);
+	    }
+    }
 
 	/**
 	 *
@@ -181,7 +179,7 @@ HTML;
 	    $location = $parseUrl['path'];
 
 	    $paramsToAdd = array(
-	    	'wpacu_time' => time(),
+		    'wpacu_time' => time(),
 		    'nocache'    => 'true'
 	    );
 
@@ -207,7 +205,7 @@ HTML;
 	    set_transient('wpacu_page_just_updated', 1, 30);
 
 	    wp_safe_redirect($location);
-    	exit();
+	    exit();
     }
 
     /**
@@ -218,15 +216,15 @@ HTML;
      * Front-end view: triggered by direct call
      *
      * @param $postId
-     * @param array $post
+     * @param mixed $post
      */
-    public function savePost($postId, $post = array())
+    public function savePost($postId, $post = '')
     {
 	    if (empty($post) || $post === '') {
 		    global $post;
 	    }
 
-	    if (! isset($post->ID, $post->post_type)) {
+	    if (! isset($post->ID) || ! isset($post->post_type)) {
 		    return;
 	    }
 
@@ -280,7 +278,7 @@ HTML;
 	    // Was the Assets List Layout changed?
 	    self::updateAssetListLayoutSettings();
 
-        // If globally disabled, make exception to load for submitted assets
+        // If globally disabled, make an exception to load for submitted assets
         $this->saveLoadExceptions('post', $postId);
 
 	    // Add / Remove Site-wide Unloads
@@ -293,7 +291,7 @@ HTML;
 	    // Any positions changed?
         // For Pro Only
 
-        // Any preloads
+	    // Any preloads
 	    Preloads::updatePreloads();
 
 	    // Any handle notes
@@ -328,16 +326,16 @@ HTML;
 
         $jsonNoAssetsLoadList = json_encode($wpacuNoLoadAssets);
 
-        Misc::addUpdateOption(WPACU_PLUGIN_ID . '_front_page_no_load', $jsonNoAssetsLoadList);
+	    Misc::addUpdateOption(WPACU_PLUGIN_ID . '_front_page_no_load', $jsonNoAssetsLoadList);
 
-        // If globally disabled, make exception to load for submitted assets
+        // If globally disabled, make an exception to load for submitted assets
         $this->saveLoadExceptions('front_page');
 
         // Add / Remove Site-wide Unloads
 		$this->updateEverywhereUnloads();
 
-		// Any preloads
-        Preloads::updatePreloads();
+	    // Any preloads
+	    Preloads::updatePreloads();
 
 		// Any handle notes
         self::updateHandleNotes();
@@ -345,11 +343,11 @@ HTML;
         // Any ignore deps
         self::updateIgnoreChild();
 
-	    self::clearTransients();
-
 	    add_action('wpacu_admin_notices', array($this, 'homePageUpdated'));
 
 	    $this->frontEndUpdateFor['homepage'] = true;
+
+	    self::clearTransients();
 
 	    // Clear all cache
 	    OptimizeCommon::clearAllCache();
@@ -359,13 +357,13 @@ HTML;
 	 *
 	 */
 	public function homePageUpdated()
-	{
-		?>
-        <div class="updated notice wpacu-notice is-dismissible">
-            <p><?php echo $this->updateDoneMsg['homepage']; ?></p>
-        </div>
-		<?php
-	}
+    {
+	?>
+	    <div class="updated notice wpacu-notice is-dismissible">
+		    <p><?php echo $this->updateDoneMsg['homepage']; ?></p>
+	    </div>
+	<?php
+    }
 
 	/**
 	 * Lite: For Singular Page (Post, Page, Custom Post Type) and Front Page (Home Page)
@@ -396,7 +394,9 @@ HTML;
         // Clear existing list first
         if ($type === 'post') {
             delete_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_load_exceptions');
-        } elseif ($type === 'front_page') {
+        }
+
+        if ($type === 'front_page') {
             delete_option( WPACU_PLUGIN_ID . '_front_page_load_exceptions');
         }
 
@@ -458,47 +458,46 @@ HTML;
                 if (! add_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_load_exceptions', $jsonLoadExceptions, true)) {
                     update_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_load_exceptions', $jsonLoadExceptions);
                 }
-            } elseif ($type === 'front_page') {
-                Misc::addUpdateOption( WPACU_PLUGIN_ID . '_front_page_load_exceptions', $jsonLoadExceptions);
             }
 
-	        }
-    }
-
-    /*
-     * This method should ONLY be triggered when the "Asset CleanUp Options" area is visible
-     */
-    public function updatePageOptions($postId)
-    {
-        // Is the "Asset CleanUp: Page Options" meta box not loaded?
-        // Then do not perform any update below
-        $pageOptionsMetaBoxLoaded = Misc::getVar('post', 'wpacu_meta_box_page_options_loaded', false);
-
-        if (! $pageOptionsMetaBoxLoaded) {
-            return;
-        }
-
-        $pageOptions = Misc::getVar('post', WPACU_PLUGIN_ID.'_page_options', array());
-
-        // In order for the "Apply the selected options" to work
-        // At least one of the checkboxes above have to be enabled
-        if (isset($pageOptions['apply_options_for']) && $pageOptions['apply_options_for'] && count($pageOptions) === 1) {
-	        $pageOptions = array();
-        }
-
-        // No page options? Delete any entry from the database to free up space
-        // instead of updating it as an empty entry
-        if (empty($pageOptions)) {
-            delete_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_page_options');
-            return;
-        }
-
-        $pageOptionsJson = json_encode($pageOptions);
-
-        if (! add_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_page_options', $pageOptionsJson, true)) {
-            update_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_page_options', $pageOptionsJson);
+            if ($type === 'front_page') {
+	            Misc::addUpdateOption( WPACU_PLUGIN_ID . '_front_page_load_exceptions', $jsonLoadExceptions);
+            }
         }
     }
+
+	/*
+	 * This method should ONLY be triggered when the "Asset CleanUp Options" area is visible
+	 */
+	public function updatePageOptions($postId)
+	{
+		// Is the "Asset CleanUp: Page Options" meta box not loaded?
+		// Then do not perform any update below
+		if (! Misc::getVar('post', 'wpacu_meta_box_page_options_loaded', false)) {
+			return;
+		}
+
+		$pageOptions = Misc::getVar('post', WPACU_PLUGIN_ID.'_page_options', array());
+
+		// In order for the "Apply the selected options" to work
+		// At least one of the checkboxes above have to be enabled
+		if (isset($pageOptions['apply_options_for']) && $pageOptions['apply_options_for'] && count($pageOptions) === 1) {
+			$pageOptions = array();
+		}
+
+		// No page options? Delete any entry from the database to free up space
+		// instead of updating it as an empty entry
+		if (empty($pageOptions)) {
+			delete_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_page_options');
+			return;
+		}
+
+		$pageOptionsJson = json_encode($pageOptions);
+
+		if (! add_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_page_options', $pageOptionsJson, true)) {
+			update_post_meta($postId, '_' . WPACU_PLUGIN_ID . '_page_options', $pageOptionsJson);
+		}
+	}
 
 	/**
 	 * Triggers either "saveToEverywhereUnloads" or "removeEverywhereUnloads" methods
@@ -693,7 +692,7 @@ HTML;
             }
         }
 
-        Misc::addUpdateOption( WPACU_PLUGIN_ID . '_bulk_unload', json_encode($existingList));
+	    Misc::addUpdateOption( WPACU_PLUGIN_ID . '_bulk_unload', json_encode($existingList));
     }
 
     /**
@@ -706,8 +705,9 @@ HTML;
         if (! $postType) {
             global $post;
 
-            // In the lite version, post type unload is the only option for bulk unloads
-            $postType = isset($post->post_type) ? $post->post_type : false;
+            // In the LITE version, post type unload is the only option for bulk unloads
+            // $postType could be 'post', 'page' or a custom post type such as 'product' (WooCommerce), 'download' (Easy Digital Downloads), etc.
+	        $postType = isset($post->post_type) ? $post->post_type : false;
 
             if (! $postType) {
             	return false;
@@ -716,8 +716,8 @@ HTML;
 
 	    $bulkType = 'post_type';
 
-	    $stylesList = Misc::getVar('post', 'wpacu_options_' . $bulkType . '_styles', array());
-	    $scriptsList = Misc::getVar('post', 'wpacu_options_' . $bulkType . '_scripts', array());
+	    $stylesList = Misc::getVar('post', 'wpacu_options_'.$bulkType.'_styles', array());
+	    $scriptsList = Misc::getVar('post', 'wpacu_options_'.$bulkType.'_scripts', array());
 
         if (empty($stylesList) && empty($scriptsList)) {
         	return false;
@@ -765,20 +765,20 @@ HTML;
                     continue;
                 }
 
-                foreach ($existingList[$assetType]['post_type'][$postType] as $handleKey => $handle) {
-                    if (in_array($handle, $list)) {
-                        unset($existingList[$assetType]['post_type'][$postType][$handleKey]);
-                        $isUpdated = true;
-                    }
-                }
+	            foreach ( $existingList[ $assetType ][ $bulkType ][ $postType ] as $handleKey => $handle ) {
+		            if ( in_array( $handle, $list ) ) {
+			            unset( $existingList[ $assetType ][ $bulkType ][ $postType ][ $handleKey ] );
+			            $isUpdated = true;
+		            }
+	            }
             }
 
-            Misc::addUpdateOption( WPACU_PLUGIN_ID . '_bulk_unload', json_encode($existingList));
+	        Misc::addUpdateOption( WPACU_PLUGIN_ID . '_bulk_unload', json_encode($existingList));
         }
 
         return $isUpdated;
     }
-    
+
 	/**
 	 *
 	 */
@@ -877,7 +877,8 @@ HTML;
 	 *
 	 */
 	public static function clearTransients()
-    {
-	    delete_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets');
-    }
+	{
+		delete_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets_all');
+		delete_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets_per_page');
+	}
 }

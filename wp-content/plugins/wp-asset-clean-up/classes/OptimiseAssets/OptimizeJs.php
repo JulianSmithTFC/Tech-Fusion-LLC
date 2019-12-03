@@ -118,8 +118,15 @@ class OptimizeJs
 
 		$transientName = 'wpacu_js_optimize_'.$handleDbStr;
 
-		if (! isset($GLOBALS['from_location_inc'])) { $GLOBALS['from_location_inc'] = 1; }
-			$fromLocation = ($GLOBALS['from_location_inc'] % 2) ? 'db' : 'local';
+		if (Main::instance()->settings['fetch_cached_files_details_from'] === 'db_disk') {
+				if ( ! isset( $GLOBALS['wpacu_from_location_inc'] ) ) {
+					$GLOBALS['wpacu_from_location_inc'] = 1;
+				}
+				$fromLocation = ( $GLOBALS['wpacu_from_location_inc'] % 2 ) ? 'db' : 'disk';
+			} else {
+				$fromLocation = Main::instance()->settings['fetch_cached_files_details_from'];
+			}
+
 			$savedValues = OptimizeCommon::getTransient($transientName, $fromLocation);
 
 			if ( $savedValues ) {
@@ -134,7 +141,9 @@ class OptimizeJs
 					// Do not load any minified JS file (from the database transient cache) if it doesn't exist
 					// It will fallback to the original JS file
 					if ( isset( $savedValuesArray['source_uri'] ) && file_exists( $localPathToJsOptimized ) ) {
-						$GLOBALS['from_location_inc']++;
+						if (Main::instance()->settings['fetch_cached_files_details_from'] === 'db_disk') {
+							$GLOBALS['wpacu_from_location_inc']++;
+						}
 
 						return array(
 							$savedValuesArray['source_uri'],

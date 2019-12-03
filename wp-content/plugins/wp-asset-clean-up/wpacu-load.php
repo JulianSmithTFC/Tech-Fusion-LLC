@@ -29,28 +29,24 @@ function includeWpAssetCleanUpClassesAutoload($class)
 spl_autoload_register('includeWpAssetCleanUpClassesAutoload');
 
 // Main Class
-WpAssetCleanUp\Main::instance();
+\WpAssetCleanUp\Main::instance();
 
-// Code needed ONLY for Asset CleanUp LITE
-new \WpAssetCleanUp\Lite();
+$wpacuSettingsClass = new \WpAssetCleanUp\Settings();
+
+if (is_admin()) {
+	$wpacuSettingsClass->adminInit();
+}
 
 // Plugin's Assets (used only when you're logged in)
 $wpacuOwnAssets = new \WpAssetCleanUp\OwnAssets;
 $wpacuOwnAssets->init();
 
 // Add / Update / Remove Settings
-$wpacuUpdate = new WpAssetCleanUp\Update;
+$wpacuUpdate = new \WpAssetCleanUp\Update;
 $wpacuUpdate->init();
 
-// Settings
-$wpacuSettings = new WpAssetCleanUp\Settings;
-
-if (is_admin()) {
-	$wpacuSettings->adminInit();
-}
-
 // Various functions
-new WpAssetCleanUp\Misc;
+new \WpAssetCleanUp\Misc;
 
 // Menu
 new \WpAssetCleanUp\Menu;
@@ -85,7 +81,9 @@ if (is_admin()) {
 	/*
 	 * Trigger only within the Dashboard view (e.g. within /wp-admin/)
 	 */
-	new \WpAssetCleanUp\Plugin;
+	$wpacuPlugin = new \WpAssetCleanUp\Plugin;
+	$wpacuPlugin->init();
+
 	new \WpAssetCleanUp\PluginReview();
 
 	$wpacuPluginTracking = new \WpAssetCleanUp\PluginTracking();

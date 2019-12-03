@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Asset CleanUp: Page Speed Booster
  * Plugin URI: https://wordpress.org/plugins/wp-asset-clean-up/
- * Version: 1.3.4.7
+ * Version: 1.3.5.1
  * Description: Unload Chosen Scripts & Styles from Posts/Pages to reduce HTTP Requests, Combine/Minify CSS/JS files
  * Author: Gabriel Livan
  * Author URI: http://gabelivan.com/
@@ -12,7 +12,7 @@
 
 // Is the Pro version triggered before the Lite one and are both plugins active?
 if (! defined('WPACU_PLUGIN_VERSION')) {
-	define('WPACU_PLUGIN_VERSION', '1.3.4.7');
+	define('WPACU_PLUGIN_VERSION', '1.3.5.1');
 }
 
 // Exit if accessed directly
@@ -104,11 +104,17 @@ define('WPACU_LOAD_ASSETS_REQ_KEY', WPACU_PLUGIN_ID . '_load');
 require_once WPACU_PLUGIN_DIR.'/wpacu-load.php';
 
 if (! is_admin()) {
+	add_action('init', static function() { // very early triggering to set WPACU_ALL_ACTIVE_PLUGINS_LOADED
+		if (defined('WPACU_ALL_ACTIVE_PLUGINS_LOADED')) { return; }
+		define('WPACU_ALL_ACTIVE_PLUGINS_LOADED', true);
+		\WpAssetCleanUp\Plugin::preventAnyChanges();
+	}, 1);
+
 	require_once WPACU_PLUGIN_DIR . '/vendor/autoload.php';
 }
 
 // [wpacu_lite]
-$wpacuSettingsList = $wpacuSettings->getAll();
+$wpacuSettingsList = $wpacuSettingsClass->getAll();
 
 if (! $wpacuSettingsList['disable_freemius']) {
 	require_once WPACU_PLUGIN_DIR . '/freemius-load.php';

@@ -93,7 +93,7 @@ class Menu
             __('Bulk Changes', 'wp-asset-clean-up'),
 		    self::getAccessCapability(),
 		    WPACU_PLUGIN_ID . '_bulk_unloads',
-            array(new BulkUnloads, 'pageBulkUnloads')
+            array(new BulkChanges, 'pageBulkUnloads')
         );
 
 	    add_submenu_page(

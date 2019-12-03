@@ -410,7 +410,7 @@ class Preloads
 	 *
 	 * @return void
 	 */
-	public function removePreloadFromChosenAssets()
+	public static function removePreloadFromChosenAssets()
 	{
 		$stylesCheckedList  = Misc::getVar('post', 'wpacu_styles_remove_preloads',  array());
 		$scriptsCheckedList = Misc::getVar('post', 'wpacu_scripts_remove_preloads', array());

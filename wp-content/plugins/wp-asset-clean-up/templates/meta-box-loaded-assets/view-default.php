@@ -41,7 +41,7 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
             if (! empty($data['all']['styles'])) {
                 ?>
                 <p><?php echo sprintf(__('Please select the styles &amp; scripts that are %sNOT NEEDED%s from the list below. Not sure which ones to unload? %s Use "Test Mode" (to make the changes apply only to you), while you are going through the trial &amp; error process.', 'wp-asset-clean-up'), '<span style="color: #CC0000;"><strong>', '</strong></span>', '<img draggable="false" class="wpacu-emoji" alt="🤔" src="https://s.w.org/images/core/emoji/12.0.0-1/svg/1f914.svg" />'); ?></p>
-                <p><?php echo __('"Load in on this page (make exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
+                <p><?php echo __('"Load in on this page (make an exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
                 <?php
 	            if ($data['plugin_settings']['hide_core_files']) {
 		            ?>
@@ -103,7 +103,7 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
         if (! empty($data['all']['scripts'])) {
             ?>
             <p><?php echo sprintf(__('Please select the styles &amp; scripts that are %sNOT NEEDED%s from the list below. Not sure which ones to unload? %s Use "Test Mode" (to make the changes apply only to you), while you are going through the trial &amp; error process.', 'wp-asset-clean-up'), '<span style="color: #CC0000;"><strong>', '</strong></span>', '<img draggable="false" class="wpacu-emoji" alt="🤔" src="https://s.w.org/images/core/emoji/12.0.0-1/svg/1f914.svg" />'); ?></p>
-            <p><?php echo __('"Load in on this page (make exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
+            <p><?php echo __('"Load in on this page (make an exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
             <?php
             if ($data['plugin_settings']['hide_core_files']) {
                 ?>

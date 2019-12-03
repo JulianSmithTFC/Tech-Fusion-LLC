@@ -31,19 +31,19 @@ do_action('wpacu_admin_notices');
 
 if ($data['for'] === 'post_types') {
 	?>
-	<div style="margin: 15px 0;">
-		<form id="wpacu_post_type_form" method="get" action="<?php echo admin_url('admin.php'); ?>">
-			<input type="hidden" name="page" value="wpassetcleanup_bulk_unloads" />
-			<input type="hidden" name="wpacu_for" value="post_types" />
+    <div style="margin: 15px 0;">
+        <form id="wpacu_post_type_form" method="get" action="<?php echo admin_url('admin.php'); ?>">
+            <input type="hidden" name="page" value="wpassetcleanup_bulk_unloads" />
+            <input type="hidden" name="wpacu_for" value="post_types" />
 
-			<div style="margin: 0 0 10px 0;"><?php _e('Select the page or post type (including custom ones) for which you want to see the unloaded scripts &amp; styles', 'wp-asset-clean-up'); ?>:</div>
-			<select id="wpacu_post_type_select" name="wpacu_post_type">
+            <div style="margin: 0 0 10px 0;">Select the page or post type (including custom ones) for which you want to see the unloaded scripts &amp; styles:</div>
+            <select id="wpacu_post_type_select" name="wpacu_post_type">
 				<?php foreach ($data['post_types_list'] as $postTypeKey => $postTypeValue) { ?>
-					<option <?php if ($data['post_type'] === $postTypeKey) { echo 'selected="selected"'; } ?> value="<?php echo $postTypeKey; ?>"><?php echo $postTypeValue; ?></option>
+                    <option <?php if ($data['post_type'] === $postTypeKey) { echo 'selected="selected"'; } ?> value="<?php echo $postTypeKey; ?>"><?php echo $postTypeValue; ?></option>
 				<?php } ?>
-			</select>
-		</form>
-	</div>
+            </select>
+        </form>
+    </div>
 	<?php
 }
 ?>
@@ -52,47 +52,49 @@ if ($data['for'] === 'post_types') {
 	<?php
 	if ($data['for'] === 'everywhere') {
 		?>
-		<div class="wpacu-clearfix"></div>
+        <div class="wpacu-clearfix"></div>
 
-		<div class="alert">
-            <p>This is the list of the assets that are <strong>globally unloaded</strong> on all pages (including home page). &nbsp;&nbsp;<a id="wpacu-add-bulk-rules-info-target" href="#wpacu-add-bulk-rules-info" style="text-decoration: none;"><span class="dashicons dashicons-info"></span> How the list below gets filled with site-wide rules?</a></p>
-			<p>If you want to remove this rule and have them loading, use the "Remove site-wide rule" checkbox.</p>
-			<div style="margin: 0; background: white; padding: 10px; border: 1px solid #ccc; width: auto; display: inline-block;">
-				<ul>
-					<li>This list fills once you select "<em>Unload site-wide</em>" when you edit posts/pages for the assets that you want to prevent from loading on every page.</li>
-					<li>On this page you can only remove the global rules that were added while editing the pages/posts.</li>
-				</ul>
-			</div>
-		</div>
+        <div class="alert">
+            <p>This is the list of the assets that are <strong>unloaded everywhere</strong> (site-wide) on all pages (including home page). &nbsp;&nbsp;<a id="wpacu-add-bulk-rules-info-target" href="#wpacu-add-bulk-rules-info" style="text-decoration: none;"><span class="dashicons dashicons-info"></span> How the list below gets filled with site-wide rules?</a></p>
+            <p>If you want to remove this rule and have them loading, use the "Remove site-wide rule" checkbox.</p>
+            <div style="margin: 0; background: white; padding: 10px; border: 1px solid #ccc; width: auto; display: inline-block;">
+                <ul>
+                    <li>This list fills once you select "<em>Unload everywhere</em>" when you edit posts/pages for the assets that you want to prevent from loading on every page.</li>
+                    <li>On this page you can only remove the global rules that were added while editing the pages/posts.</li>
+                </ul>
+            </div>
+        </div>
 
-		<div class="wpacu-clearfix"></div>
+        <div class="wpacu-clearfix"></div>
 
 		<div style="padding: 0 10px 0 0;">
 			<p style="margin-bottom: 10px;"><strong><?php _e('Stylesheets (.css) Unloaded', 'wp-asset-clean-up'); ?></strong></p>
 			<?php
 			if (! empty($data['values']['styles'])) {
 				?>
-				<table class="wp-list-table widefat fixed striped">
-					<tr>
-						<td><strong>Handle</strong></td>
-						<td><strong><?php _e('Actions', 'wp-asset-clean-up'); ?></strong></td>
-					</tr>
+                <table class="wp-list-table widefat fixed striped">
+                    <tr>
+                        <td><strong>Handle</strong></td>
+                        <td><strong>Actions</strong></td>
+                    </tr>
 					<?php
 					foreach ($data['values']['styles'] as $handle) {
 						?>
-						<tr class="wpacu_global_rule_row">
-							<td><strong><span style="color: green;"><?php echo $handle; ?></span></strong></td>
-							<td>
-								<label><input type="checkbox"
-								              class="wpacu_remove_rule"
-								              name="wpacu_options_styles[<?php echo $handle; ?>]"
-								              value="remove" /> Remove site-wide rule</label>
-							</td>
-						</tr>
+                        <tr class="wpacu_global_rule_row wpacu_bulk_change_row">
+                            <td>
+                                <?php wpacuRenderHandleTd($handle, 'styles', $data); ?>
+                            </td>
+                            <td>
+                                <label><input type="checkbox"
+                                              class="wpacu_bulk_rule_checkbox"
+                                              name="wpacu_options_styles[<?php echo $handle; ?>]"
+                                              value="remove" /> Remove site-wide rule</label>
+                            </td>
+                        </tr>
 						<?php
 					}
 					?>
-				</table>
+                </table>
 				<?php
 			} else {
 				?>
@@ -107,27 +109,29 @@ if ($data['for'] === 'post_types') {
 			<?php
 			if (! empty($data['values']['scripts'])) {
 				?>
-				<table class="wp-list-table widefat fixed striped">
-					<tr>
-						<td><strong>Handle</strong></td>
-						<td><strong><?php _e('Actions', 'wp-asset-clean-up'); ?></strong></td>
-					</tr>
+                <table class="wp-list-table widefat fixed striped">
+                    <tr>
+                        <td><strong>Handle</strong></td>
+                        <td><strong>Actions</strong></td>
+                    </tr>
 					<?php
 					foreach ($data['values']['scripts'] as $handle) {
 						?>
-						<tr class="wpacu_global_rule_row">
-							<td><strong><span style="color: green;"><?php echo $handle; ?></span></strong></td>
-							<td>
-								<label><input type="checkbox"
-								              class="wpacu_remove_rule"
-								              name="wpacu_options_scripts[<?php echo $handle; ?>]"
-								              value="remove" /> <?php _e('Remove rule', 'wp-asset-clean-up'); ?></label>
-							</td>
-						</tr>
+                        <tr class="wpacu_global_rule_row wpacu_bulk_change_row">
+                            <td>
+	                            <?php wpacuRenderHandleTd($handle, 'scripts', $data); ?>
+                            </td>
+                            <td>
+                                <label><input type="checkbox"
+                                              class="wpacu_bulk_rule_checkbox"
+                                              name="wpacu_options_scripts[<?php echo $handle; ?>]"
+                                              value="remove" /> Remove site-wide rule</label>
+                            </td>
+                        </tr>
 						<?php
 					}
 					?>
-				</table>
+                </table>
 				<?php
 			} else {
 				?>
@@ -135,22 +139,24 @@ if ($data['for'] === 'post_types') {
 				<?php
 			}
 			?>
-		</div>
+        </div>
 		<?php
-	} elseif ($data['for'] === 'post_types') {
-		?>
-		<div class="wpacu-clearfix"></div>
+	}
 
-		<div class="alert">
-			<p>This is the list of the assets that are <strong>unloaded</strong> on all pages belonging to the <strong><u><?php echo $data['post_type']; ?></u></strong> post type. &nbsp;&nbsp;<a id="wpacu-add-bulk-rules-info-target" href="#wpacu-add-bulk-rules-info" style="text-decoration: none;"><span class="dashicons dashicons-info"></span> How the list below gets filled with site-wide rules?</a></p>
-			<p>If you want to make an asset load again, use the "Remove rule" checkbox.</p>
-			<div style="margin: 0; background: white; padding: 10px; border: 1px solid #ccc; width: auto; display: inline-block;">
-				<ul>
-					<li>This list fills once you select "<em>Unload on All Pages of <strong><?php echo $data['post_type']; ?></strong> post type</em>" when you edit posts/pages for the assets that you want to prevent from loading.</li>
-					<li>On this page you can only remove the global rules that were added while editing <strong><?php echo $data['post_type']; ?></strong> post types.</li>
-				</ul>
-			</div>
-		</div>
+	if ($data['for'] === 'post_types') {
+		?>
+        <div class="wpacu-clearfix"></div>
+
+        <div class="alert">
+            <p>This is the list of the assets that are <strong>unloaded</strong> on all pages belonging to the <strong><u><?php echo $data['post_type']; ?></u></strong> post type. &nbsp;&nbsp;<a id="wpacu-add-bulk-rules-info-target" href="#wpacu-add-bulk-rules-info" style="text-decoration: none;"><span class="dashicons dashicons-info"></span> How the list below gets filled with site-wide rules?</a></p>
+            <p>If you want to make an asset load again, use the "Remove bulk rule" checkbox.</p>
+            <div style="margin: 0; background: white; padding: 10px; border: 1px solid #ccc; width: auto; display: inline-block;">
+                <ul>
+                    <li>This list fills once you select "<em>Unload on All Pages of <strong><?php echo $data['post_type']; ?></strong> post type</em>" when you edit posts/pages for the assets that you want to prevent from loading.</li>
+                    <li>On this page you can only remove the global rules that were added while editing <strong><?php echo $data['post_type']; ?></strong> post types.</li>
+                </ul>
+            </div>
+        </div>
 
 		<div class="wpacu-clearfix"></div>
 
@@ -159,31 +165,31 @@ if ($data['for'] === 'post_types') {
 			<?php
 			if (! empty($data['values']['styles'])) {
 				?>
-				<table class="wp-list-table widefat fixed striped">
-					<tr>
-						<td><strong>Handle</strong></td>
-						<td><strong><?php _e('Actions', 'wp-asset-clean-up'); ?></strong></td>
-					</tr>
+                <table class="wp-list-table widefat fixed striped">
+                    <tr>
+                        <td><strong>Handle</strong></td>
+                        <td><strong>Actions</strong></td>
+                    </tr>
 					<?php
 					foreach ($data['values']['styles'] as $handle) {
 						?>
-						<tr class="wpacu_global_rule_row">
-							<td><strong><span style="color: green;"><?php echo $handle; ?></span></strong></td>
-							<td>
-								<label><input type="checkbox"
-								              class="wpacu_remove_rule"
-								              name="wpacu_options_post_type_styles[<?php echo $handle; ?>]"
-								              value="remove" /> <?php _e('Remove rule', 'wp-asset-clean-up'); ?></label>
-							</td>
-						</tr>
+                        <tr class="wpacu_global_rule_row wpacu_bulk_change_row">
+                            <td><?php wpacuRenderHandleTd($handle, 'styles', $data); ?></td>
+                            <td>
+                                <label><input type="checkbox"
+                                              class="wpacu_bulk_rule_checkbox"
+                                              name="wpacu_options_post_type_styles[<?php echo $handle; ?>]"
+                                              value="remove" /> Remove bulk rule</label>
+                            </td>
+                        </tr>
 						<?php
 					}
 					?>
-				</table>
+                </table>
 				<?php
 			} else {
 				?>
-				<p>There are no bulk unloaded styles for the <strong><?php echo $data['post_type']; ?></strong> post type.</p>
+                <p>There are no bulk unloaded styles for the <strong><?php echo $data['post_type']; ?></strong> post type.</p>
 				<?php
 			}
 			?>
@@ -195,35 +201,35 @@ if ($data['for'] === 'post_types') {
 			<?php
 			if (! empty($data['values']['scripts'])) {
 				?>
-				<table class="wp-list-table widefat fixed striped">
-					<tr>
-						<td><strong>Handle</strong></td>
-						<td><strong><?php _e('Actions', 'wp-asset-clean-up'); ?></strong></td>
-					</tr>
+                <table class="wp-list-table widefat fixed striped">
+                    <tr>
+                        <td><strong>Handle</strong></td>
+                        <td><strong>Actions</strong></td>
+                    </tr>
 					<?php
 					foreach ($data['values']['scripts'] as $handle) {
 						?>
-						<tr class="wpacu_global_rule_row">
-							<td><strong><span style="color: green;"><?php echo $handle; ?></span></strong></td>
-							<td>
-								<label><input type="checkbox"
-								              class="wpacu_remove_rule"
-								              name="wpacu_options_post_type_scripts[<?php echo $handle; ?>]"
-								              value="remove" /> <?php _e('Remove rule', 'wp-asset-clean-up'); ?></label>
-							</td>
-						</tr>
+                        <tr class="wpacu_global_rule_row wpacu_bulk_change_row">
+                            <td><?php wpacuRenderHandleTd($handle, 'scripts', $data); ?></td>
+                            <td>
+                                <label><input type="checkbox"
+                                              class="wpacu_bulk_rule_checkbox"
+                                              name="wpacu_options_post_type_scripts[<?php echo $handle; ?>]"
+                                              value="remove" /> Remove bulk rule</label>
+                            </td>
+                        </tr>
 						<?php
 					}
 					?>
-				</table>
+                </table>
 				<?php
 			} else {
 				?>
-				<p>There are no bulk unloaded scripts for the <strong><?php echo $data['post_type']; ?></strong> post type.</p>
+                <p>There are no bulk unloaded scripts for the <strong><?php echo $data['post_type']; ?></strong> post type.</p>
 				<?php
 			}
 			?>
-		</div>
+        </div>
 		<?php
 	}
 
@@ -231,31 +237,32 @@ if ($data['for'] === 'post_types') {
 	?>
 	<?php wp_nonce_field($data['nonce_action'], $data['nonce_name']); ?>
 
-	<input type="hidden" name="wpacu_for" value="<?php echo $data['for']; ?>" />
-	<input type="hidden" name="wpacu_update" value="1" />
+    <input type="hidden" name="wpacu_for" value="<?php echo $data['for']; ?>" />
+    <input type="hidden" name="wpacu_update" value="1" />
 
 	<?php
 	if ($data['for'] === 'post_types' && isset($data['post_type'])) {
 		?>
-		<input type="hidden" name="wpacu_post_type" value="<?php echo $data['post_type']; ?>" />
+        <input type="hidden" name="wpacu_post_type" value="<?php echo $data['post_type']; ?>" />
 		<?php
 	}
 	?>
 
-	<div class="wpacu-clearfix"></div>
-	<div id="wpacu-update-button-area" class="no-left-margin">
-		<p class="submit">
+    <div class="wpacu-clearfix"></div>
+
+    <div id="wpacu-update-button-area" class="no-left-margin">
+        <p class="submit">
 			<?php
-			wp_nonce_field('wpacu_bulk_unloads_update', 'wpacu_bulk_unloads_nonce');
+			wp_nonce_field('wpacu_bulk_unloads_update', 'wpacu_bulk_unloads_update_nonce' );
 			?>
-			<input type="submit"
-			       name="submit"
-			       id="submit"
+            <input type="submit"
+                   name="submit"
+                   id="submit"
 				<?php if ($noAssetsToRemove) { ?>
-					disabled="disabled"
+                    disabled="disabled"
 				<?php } ?>
-				   class="button button-primary"
-				   value="<?php esc_attr_e('Apply changes', 'wp-asset-clean-up'); ?>" />
+                   class="button button-primary"
+                   value="<?php esc_attr_e('Apply changes', 'wp-asset-clean-up'); ?>" />
 			<?php
 			if ($noAssetsToRemove) {
 				?>
@@ -263,8 +270,11 @@ if ($data['for'] === 'post_types') {
 				<?php
 			}
 			?>
-		</p>
-	</div>
+        </p>
+        <div id="wpacu-updating-settings" style="margin-left: 150px;">
+            <img src="<?php echo admin_url(); ?>/images/spinner.gif" align="top" width="20" height="20" alt="" />
+        </div>
+    </div>
 </form>
 <!-- Start Site-Wide Modal -->
 <div id="wpacu-add-bulk-rules-info" class="wpacu-modal">

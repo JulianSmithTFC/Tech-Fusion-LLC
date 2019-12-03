@@ -16,7 +16,7 @@ foreach ($data['all']['styles'] as $obj) {
 	 * $data['row']['is_global_rule'] is only used to apply a red background in the style's area to point out that the style is unloaded
 	 *               is set to `true` if either the asset is unloaded everywhere or it's unloaded on a group of pages (such as all pages belonging to 'page' post type)
 	*/
-	$data['row']['global_unloaded'] = $data['row']['is_post_type_unloaded'] = $data['row']['is_load_exception'] = $data['row']['is_global_rule'] = false;
+	$data['row']['global_unloaded'] = $data['row']['is_post_type_unloaded'] = $data['row']['is_load_exception_per_page'] = $data['row']['is_global_rule'] = false;
 
 	// Mark it as unloaded - Everywhere
 	if (in_array($data['row']['obj']->handle, $data['global_unload']['styles'])) {
@@ -32,10 +32,10 @@ foreach ($data['all']['styles'] as $obj) {
 		}
 	}
 
-	$isLoadException = in_array($data['row']['obj']->handle, $data['load_exceptions']['styles']);
+	$isLoadExceptionPerPage = isset($data['load_exceptions']['styles']) && in_array($data['row']['obj']->handle, $data['load_exceptions']['styles']);
 
-	if ($isLoadException) {
-		$data['row']['is_load_exception'] = true;
+	if ($isLoadExceptionPerPage) {
+		$data['row']['is_load_exception_per_page'] = true;
 	} elseif ($data['row']['is_global_rule']) {
 		$data['row']['class'] .= ' wpacu_not_load';
 	}
@@ -64,7 +64,7 @@ foreach ($data['all']['styles'] as $obj) {
 		if (isset($data['rows_by_location']) && $data['rows_by_location']) {
 			$data['rows_assets']
 	          [$data['row']['obj']->locationMain] // 'plugins', 'themes' etc.
-			    [$data['row']['obj']->locationChild]
+			    [$data['row']['obj']->locationChild] // Theme/Plugin Title
 			      [$uniqueHandle]
 			        ['style'] = $templateRowOutput;
 		} elseif (isset($data['rows_by_position']) && $data['rows_by_position']) {

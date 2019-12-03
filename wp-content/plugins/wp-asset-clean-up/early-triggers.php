@@ -13,10 +13,21 @@ if (! function_exists('assetCleanUpNoLoad')) {
 	 */
 	function assetCleanUpNoLoad()
 	{
+		// Hide top WordPress admin bar on request for debugging purposes and a cleared view of the tested page
+		if (array_key_exists('wpacu_no_admin_bar', $_GET)) {
+			add_filter('show_admin_bar', '__return_false', PHP_INT_MAX);
+		}
+
 		// On request: for debugging purposes - e.g. https://yourwebsite.com/?wpacu_no_load
 		// Also make sure it's in the REQUEST URI and $_GET wasn't altered incorrectly before it's checked
-		// Technically, it will be like Asset CleanUp is not activated: no global settings and unload rules will be applied
+		// Technically, it will be like the plugin is not activated: no global settings and unload rules will be applied
 		if (array_key_exists('wpacu_no_load', $_GET) && strpos($_SERVER['REQUEST_URI'], 'wpacu_no_load') !== false) {
+			return true;
+		}
+
+		// Needs to be called ideally from a MU plugin which always loads before Asset CleanUp
+		// or from a different plugin that triggers before Asset CleanUp which is less reliable
+		if (apply_filters('wpacu_plugin_no_load', false)) {
 			return true;
 		}
 
@@ -140,21 +151,19 @@ if (! function_exists('assetCleanUpNoLoad')) {
 		// AJAX Requests from various plugins/themes
 		if ($wpacuIsAjaxRequest && isset($_GET['action'])
 		    && (strpos($_GET['action'], 'woocommerce') === 0
-	           || strpos($_GET['action'], 'wc_') === 0
-	           || strpos($_GET['action'], 'jetpack') === 0
-	           || strpos($_GET['action'], 'wpfc_') === 0
-	           || strpos($_GET['action'], 'oxygen_') === 0
-	           || strpos($_GET['action'], 'oxy_') === 0
-	           || strpos($_GET['action'], 'w3tc_') === 0
-	           || strpos($_GET['action'], 'wpforms_') === 0
-	           || strpos($_GET['action'], 'wdi_') === 0
+		        || strpos($_GET['action'], 'wc_') === 0
+		        || strpos($_GET['action'], 'jetpack') === 0
+		        || strpos($_GET['action'], 'wpfc_') === 0
+		        || strpos($_GET['action'], 'oxygen_') === 0
+		        || strpos($_GET['action'], 'oxy_') === 0
+		        || strpos($_GET['action'], 'w3tc_') === 0
+		        || strpos($_GET['action'], 'wpforms_') === 0
+		        || strpos($_GET['action'], 'wdi_') === 0
 		    )) {
 			return true;
 		}
 
-		// Needs to be called ideally from a MU plugin which always loads before Asset CleanUp
-		// or from a different plugin that triggers before Asset CleanUp which is less reliable
-		return apply_filters('wpacu_plugin_no_load', false);
+		return false;
 	}
 }
 

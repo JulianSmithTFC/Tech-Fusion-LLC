@@ -294,7 +294,7 @@ class Misc
 		    $src .= '.js';
 	    }
 
-	    $paths = array('wp-content/themes/','wp-content/plugins/','wp-content/uploads/');
+	    $paths = array('wp-includes/', 'wp-content/');
 
 	    foreach ($paths as $path) {
 	    	if (strpos($src, $path) !== false) {
@@ -541,11 +541,15 @@ HTML;
     }
 
 	/**
+	 * @param $type
+	 * e.g. 'per_page' will fetch only per page rules, excluding the bulk ones
+	 * such as unload everywhere, on this post type etc.
+	 *
 	 * @return int
 	 */
-	public static function getTotalUnloadedAssets()
+	public static function getTotalUnloadedAssets($type = 'all')
 	{
-		if ($unloadedTotalAssets = get_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets')) {
+		if ($unloadedTotalAssets = get_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets_'.$type)) {
 			return $unloadedTotalAssets;
 		}
 
@@ -592,10 +596,12 @@ SQL;
 			}
 		}
 
-		$unloadedTotalAssets += self::getTotalBulkUnloadsFor('all');
+		if ($type === 'all') {
+			$unloadedTotalAssets += self::getTotalBulkUnloadsFor( 'all' );
+		}
 
 		// To avoid the complex SQL query next time
-		set_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets', $unloadedTotalAssets, 28800);
+		set_transient(WPACU_PLUGIN_ID. '_total_unloaded_assets_'.$type, $unloadedTotalAssets, 28800);
 
 		return $unloadedTotalAssets;
 	}

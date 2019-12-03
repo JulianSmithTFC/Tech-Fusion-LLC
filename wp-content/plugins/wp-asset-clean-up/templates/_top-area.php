@@ -83,31 +83,38 @@ $goBackToCurrentUrl = '&_wp_http_referer=' . urlencode( wp_unslash( $_SERVER['RE
 <div class="wpacu-tabs wpacu-tabs-style-topline">
 	<nav>
 		<ul>
-            <?php foreach ($wpacuTopAreaLinks as $wpacuLink => $wpacuInfo) {
+            <?php
+            foreach ($wpacuTopAreaLinks as $wpacuLink => $wpacuInfo) {
 	            $wpacuIsCurrentPage = ($wpacuCurrentPage === $wpacuInfo['page']);
 	            $wpacuIsLoadManagerPageLink = ($wpacuInfo['page'] === 'wpassetcleanup_assets_manager');
 	            $wpacuIsBulkUnloadsPageLink = ($wpacuInfo['page'] === 'wpassetcleanup_bulk_unloads');
                 ?>
-			<li <?php if ($wpacuIsCurrentPage) { echo 'class="wpacu-tab-current"'; } ?>>
+                <li class="<?php if ($wpacuIsCurrentPage) { echo 'wpacu-tab-current'; } ?>">
 				<?php
 				if ($wpacuIsLoadManagerPageLink) {
-					$totalUnloadedAssets = Misc::getTotalUnloadedAssets();
+					$totalUnloadedAssets = Misc::getTotalUnloadedAssets('per_page');
 
 					if ($totalUnloadedAssets === 0) {
 						?>
-                        <span class="extra-info assets-unloaded-false"><span class="dashicons dashicons-warning"></span> No unload rules set</span>
+                        <span class="extra-info assets-unloaded-false"><span class="dashicons dashicons-warning"></span> No unloads per page</span>
 						<?php
 					} elseif ($totalUnloadedAssets > 0) {
 						?>
-                        <span class="extra-info assets-unloaded-true"><strong><?php echo $totalUnloadedAssets; ?></strong> unloaded files</span>
+                        <span class="extra-info assets-unloaded-true"><strong><?php echo $totalUnloadedAssets; ?></strong> unloaded files per page</span>
 						<?php
 					}
-				} elseif ($wpacuIsBulkUnloadsPageLink) {
+				}
+
+				if ($wpacuIsBulkUnloadsPageLink) {
 					$totalBulkUnloadRules = Misc::getTotalBulkUnloadsFor('all');
 
-					if ($totalBulkUnloadRules > 0) {
+					if ($totalBulkUnloadRules === 0) {
 						?>
-                        <span class="extra-info assets-unloaded-true"><strong><?php echo $totalBulkUnloadRules; ?></strong> bulk rules</span>
+                        <span class="extra-info no-bulk-unloads assets-unloaded-false"><span class="dashicons dashicons-warning"></span> No bulk unloads</span>
+						<?php
+					} elseif ($totalBulkUnloadRules > 0) {
+						?>
+                        <span class="extra-info has-bulk-unloads assets-unloaded-true"><strong><?php echo $totalBulkUnloadRules; ?></strong> bulk unloads</span>
 						<?php
 					}
 				}

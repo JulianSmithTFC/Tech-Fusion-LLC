@@ -3,8 +3,8 @@ Contributors: gabelivan
 Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, performance
 Donate link: https://gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.5
-Tested up to: 5.2.4
-Stable tag: 1.3.4.7
+Tested up to: 5.3
+Stable tag: 1.3.5.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -178,6 +178,33 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.5.1 =
+* Bug Fix: Prevent PHP notice errors from showing up in error log reports (not affecting the plugin's functionality)
+* Improvement for debugging purposes: Change the "Settings" values on page-request (via query string)
+* Debugging Improvement: When /?wpacu_show_handle_names is used, it will print the handle name as a "data" attribute tag within the LINK/SCRIPT; Great for debugging and to find out if any of the assets are hardcoded
+* Make sure Asset CleanUp's combine CSS/JS works if "HTML Minify" is enabled in W3 Total Cache
+
+= 1.3.5.0 =
+* Bug Fix: Sometimes, when external URLs (from a different domain) were present in the assets management list, when checking them via JavaScript for their status, the browser returned some errors interfering with "Add Media" not allowing the user to upload new images from the edit post/page area
+
+= 1.3.4.9 =
+* New Feature: Check if the CSS/JS files are reachable; Once the Assets List is loaded for management, AJAX calls would be made to check if the files are not returning 404 not found errors and anyone that returns an "error" gets highlighted (e.g. it's good in situations when a file was enqueued, but later deleted and forgotten thus ending up with 404 Bad Requests in the browser)
+* UI Improvement for "Bulk Changes": When a checkbox is ticked, highlight the area of the targeted handle (applies for any results in all the tabs)
+* Improvement: Automatic compatibility added for "WP AMP — Accelerated Mobile Pages for WordPress and WooCommerce" (premium plugin)
+* Improvement: For easier reference (determining where a handle is coming from: a plugin, the theme etc.), more information such as the source and the version number is added next to each handle in "Bulk Changes"
+* Improvement: Once the management CSS/JS list gets loaded, AJAX calls would be made to determine if the source (URL) would return a successful response or not. If a 404 is retrieved or any other error code, then the source URL would be in red color along with a notice the page might load unreachable (bad requests) CSS/JS
+* PHP 7.4 Compatibility Fix: Removed deprecated errors for "Array and string offset access syntax with curly braces is deprecated"
+* WordPress 4.3 CSS Fix: In the new WP version, some buttons and drop-downs (selects) were unaligned and showing incomplete text
+
+= 1.3.4.8 =
+* Compatibility with "AMP (Official AMP Plugin for WordPress)" and "AMP for WP – Accelerated Mobile Pages" plugins: If the page is of AMP type, no Asset CleanUp settings/rules will be triggered to avoid validation errors; Moreover, NOSCRIPT tags added by Asset CleanUp are moved to the BODY tag (they are no longer stored in the HEAD tag) to avoid further validation errors in case other AMP plugins/scripts are used and Asset CleanUp Pro doesn't detect them
+* New Feature: Skip "Test Mode" on page request for debugging purposes via /?wpacu_skip_test_mode - e.g. useful when you have to check a website and you don't have admin access and "Test Mode" is enabled (you can check if anything is broken there while the page loads fine for other visitors)
+* Improvement: Changed the way the assets list is showing up for management by reducing the size of each row (with CSS/JS file details) so it's easier for scrolling (e.g. load exceptions are showing up only if you chosen a bulk unload option, reduced the height of some of the areas, such as "Handle:", "Source:" and notes area).
+* Improvement: The number of total submitted fields is smaller now as the assets list area is not as cluttered since irrelevant fields are not submitted anymore with an empty value (this is not only useful for aesthetic reasons, but it's limiting the risk of submitting over 1000 fields where max_input_vars from php.ini is limited to only 1000 inputs)
+* Improvement: No matter what type of layout to show the assets list is chosen from "Assets List Layout:", it will show the total number of CSS/JS for each group (e.g. total files from the theme, total files from all the active plugins, etc.)
+* Improvement: Option to choose how the caching information (asset details including its location in the caching directory) is retrieved in "Plugin Usage Preferences" (useful to reduce database queries in case one has a large database that is slow in retrieving information)
+* Improvement: If all CSS/JS from a plugin (when the assets list is grouped by location) are bulk unloaded (e.g. on all posts, site-wide), then "Unload on this page" (Check All | Uncheck All) (which becomes irrelevant) is replaced with 'Make an exception from bulk unload, "Load it on this page"' (Check All | Uncheck All)
+
 = 1.3.4.7 =
 * Improvement: When assets are fetched to show in the load manager, prevent WP Rocket from running as well as Query Monitor from outputting information
 * "Duplicate Post" compatibility fix: Make sure Asset CleanUp's meta values are taken into account when a post is cloned

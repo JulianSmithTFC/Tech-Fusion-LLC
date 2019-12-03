@@ -12,13 +12,12 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
 * -------------------------
 */
 ?>
-
 <div>
     <?php
     if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
     ?>
     <p><?php echo sprintf(__('The following styles &amp; scripts are loading on this page. Please select the ones that are %sNOT NEEDED%s. If you are not sure which ones to unload, it is better to enable "Test Mode" (to make the changes apply only to you), while you are going through the trial &amp; error process.', 'wp-asset-clean-up'), '<span style="color: #CC0000;"><strong>', '</strong></span>'); ?></p>
-    <p><?php echo __('"Load in on this page (make exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
+    <p><?php echo __('"Load in on this page (make an exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
     <?php
     if ($data['plugin_settings']['hide_core_files']) {
         ?>
@@ -59,11 +58,6 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
         </div>
 
         <?php
-	    $positionsText = array(
-            'head' => '<span class="dashicons dashicons-editor-code"></span>&nbsp; HEAD tag (.css &amp; .js)',
-            'body' => '<span class="dashicons dashicons-editor-code"></span>&nbsp; BODY tag (.css &amp; .js)'
-        );
-
 	    $data['view_by_position'] =
         $data['rows_build_array'] =
         $data['rows_by_position'] = true;
@@ -72,6 +66,11 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
 
         require_once __DIR__.'/_asset-style-rows.php';
         require_once __DIR__.'/_asset-script-rows.php';
+
+	    $positionsText = array(
+		    'head' => '<span class="dashicons dashicons-editor-code"></span>&nbsp; HEAD tag (.css &amp; .js)',
+		    'body' => '<span class="dashicons dashicons-editor-code"></span>&nbsp; BODY tag (.css &amp; .js)'
+	    );
 
         if (! empty($data['rows_assets'])) {
             // Sorting: head and body
@@ -83,10 +82,22 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
 
             foreach ($rowsAssets as $positionMain => $values) {
                 ksort($values);
+
+	            $assetRowsOutput = '';
+
+	            $totalFiles    = 0;
+	            $assetRowIndex = 1;
+
+	            foreach ($values as $assetType => $assetRows) {
+		            foreach ($assetRows as $assetRow) {
+			            $assetRowsOutput .= $assetRow . "\n";
+			            $totalFiles++;
+		            }
+	            }
                 ?>
                 <div class="wpacu-assets-collapsible-wrap wpacu-by-position wpacu-wrap-area wpacu-<?php echo $positionMain; ?>">
                     <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>" href="#wpacu-assets-collapsible-content-<?php echo $positionMain; ?>">
-                        <?php echo $positionsText[$positionMain]; ?>
+                        <?php echo $positionsText[$positionMain]; ?> &#10141; Total files: <?php echo $totalFiles; ?>
                     </a>
 
                     <div class="wpacu-assets-collapsible-content <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-open<?php } ?>">
@@ -100,13 +111,7 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
                             <table class="wpacu_list_table wpacu_list_by_position wpacu_widefat wpacu_striped">
                                 <tbody>
                                 <?php
-                                $assetRowIndex = 1;
-
-                                foreach ($values as $assetType => $assetRows) {
-                                    foreach ($assetRows as $assetRow) {
-                                        echo $assetRow . "\n";
-                                    }
-                                }
+                                echo $assetRowsOutput;
                                 ?>
                                 </tbody>
                             </table>

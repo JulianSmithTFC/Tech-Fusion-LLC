@@ -25,8 +25,8 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
             __('Please select the styles &amp; scripts that are %sNOT NEEDED%s from the list below. Not sure which ones to unload? %s Use "Test Mode" (to make the changes apply only to you), while you are going through the trial &amp; error process.', 'wp-asset-clean-up'),
             '<span style="color: #CC0000;"><strong>',
             '</strong></span>',
-		    '<img draggable="false" class="wpacu-emoji" alt="🤔" src="https://s.w.org/images/core/emoji/12.0.0-1/svg/1f914.svg" />'
-        ); ?> <?php echo __('"Load in on this page (make exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
+		    '<img draggable="false" class="wpacu-emoji" style="max-width: 26px; max-height: 26px;" alt="" src="https://s.w.org/images/core/emoji/11.2.0/svg/1f914.svg">'
+        ); ?> <?php echo __('"Load in on this page (make an exception)" will take effect when a bulk unload rule is used. Otherwise, the asset will load anyway unless you select it for unload.', 'wp-asset-clean-up'); ?></p>
     <?php
     if ($data['plugin_settings']['hide_core_files']) {
         ?>
@@ -63,14 +63,6 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
 	    $allThemes  = wp_get_themes();
 	    $allActivePluginsIcons = \WpAssetCleanUp\Misc::getAllActivePluginsIcons();
 
-	    $locationsText = array(
-            'plugins'  => '<span class="dashicons dashicons-admin-plugins"></span> From Plugins (.css &amp; .js)',
-            'themes'   => '<span class="dashicons dashicons-admin-appearance"></span> From Themes (.css &amp; .js)',
-            'uploads'  => '<span class="dashicons dashicons-wordpress"></span> WordPress Uploads Directory (.css &amp; .js)',
-            'wp_core'  => '<span class="dashicons dashicons-wordpress"></span> WordPress Core (.css &amp; .js)',
-            'external' => '<span class="dashicons dashicons-cloud"></span> External 3rd Party (.css &amp; .js)'
-        );
-
 	    $data['view_by_location'] =
         $data['rows_build_array'] =
         $data['rows_by_location'] = true;
@@ -80,9 +72,17 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
         require_once __DIR__.'/_asset-style-rows.php';
         require_once __DIR__.'/_asset-script-rows.php';
 
+        $locationsText = array(
+		    'plugins'  => '<span class="dashicons dashicons-admin-plugins"></span> From Plugins (.css &amp; .js)',
+		    'themes'   => '<span class="dashicons dashicons-admin-appearance"></span> From Themes (.css &amp; .js)',
+		    'uploads'  => '<span class="dashicons dashicons-wordpress"></span> WordPress Uploads Directory (.css &amp; .js)',
+		    'wp_core'  => '<span class="dashicons dashicons-wordpress"></span> WordPress Core (.css &amp; .js)',
+		    'external' => '<span class="dashicons dashicons-cloud"></span> External 3rd Party (.css &amp; .js)',
+	    );
+
         if (! empty($data['rows_assets'])) {
             // Sorting: Plugins, Themes, Uploads Directory and External Assets
-            $rowsAssets = array('plugins' => array(), 'themes' => array(), 'uploads' => array(), 'external' => array());
+            $rowsAssets = array('plugins' => array(), 'themes' => array(), 'uploads' => array(), 'wp_core' => array(), 'external' => array());
 
 	        foreach ($data['rows_assets'] as $locationMain => $values) {
 		        $rowsAssets[$locationMain] = $values;
@@ -93,13 +93,15 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
 	            $totalLocationAssets  = count($values);
 	            $hideLocationMainArea = ($locationMain === 'uploads' && $totalLocationAssets === 0);
 	            $hideListOfAssetsOnly = ($locationMain === 'wp_core' && $data['plugin_settings']['hide_core_files']);
+
+	            ob_start();
 	            ?>
                 <div <?php if ($hideLocationMainArea) {
 		            echo 'style="display: none;"';
 	            } ?> class="wpacu-assets-collapsible-wrap wpacu-by-location wpacu-<?php echo $locationMain; ?>">
                 <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>"
                    href="#wpacu-assets-collapsible-content-<?php echo $locationMain; ?>">
-		            <?php _e($locationsText[$locationMain], 'wp-asset-clean-up'); ?>
+		            <?php echo $locationsText[$locationMain]; ?> &#10141; Total files: {total_files_<?php echo $locationMain; ?>}
                 </a>
 
                 <div class="wpacu-assets-collapsible-content <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-open<?php } ?>">
@@ -123,74 +125,118 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
                     <?php
                 } elseif ($locationMain === 'uploads') { ?>
                     <p class="wpacu-assets-note" style="padding: 15px 15px 0 0;"><strong>Note:</strong> These are the CSS/JS files load from the /wp-content/uploads/ WordPress directory. They were copied there by other plugins or developers working on the website. In case the file was detected to be generated by a specific plugin through various verification patterns (e.g. for plugins such as Elementor, Oxygen Builder etc.), then it will be not listed here, but in the "From Plugins (.css &amp; .js)" area for the detected plugin. This is to have all the files related to a plugin organised in one place.</p>
-                    <?php } ?>
+                <?php } ?>
 
 	                <?php
+	                $locationRowCount = 0;
+	                $totalLocationAssets = count($values);
+
+	                // Total files from all the plugins
+	                $totalFilesArray[$locationMain] = 0;
+
 	                if ($totalLocationAssets > 0) {
-	                    $locI = 1;
+		                $locI = 1;
 
-                        foreach ($values as $locationChild => $values2) { ?>
-                            <?php if ($locationChild !== 'none') {
-                            if ($locationMain === 'plugins') {
-                                $locationChildText = \WpAssetCleanUp\Info::getPluginInfo($locationChild, $allPlugins, $allActivePluginsIcons);
-                            } elseif ($locationMain === 'themes') {
-	                            $locationChildThemeArray = \WpAssetCleanUp\Info::getThemeInfo($locationChild, $allThemes);
-	                            $locationChildText = $locationChildThemeArray['output'];
-                            } else {
-                                $locationChildText = $locationChild;
-                            }
-                            ?>
-                            <div <?php if ($locationMain === 'plugins') { echo ' data-wpacu-plugin="' . $locationChild . '" '; } ?> class="wpacu-location-child-area <?php if ($locI === 1) { echo ' wpacu-location-child-area-first '; } ?> wpacu-area-expanded">
-                                <div class="wpacu-area-title <?php if ($locationMain === 'themes' && $locationChildThemeArray['has_icon'] === true) { echo 'wpacu-theme-has-icon'; } ?>">
-                                    <?php echo $locationChildText; ?>
+		                // Going through each plugin/theme etc.
+		                foreach ( $values as $locationChild => $values2 ) {
+			                if ($locationMain === 'plugins') {
+				                $totalPluginAssets = $totalBulkUnloadedAssetsPerPlugin = 0;
+			                }
 
-                                    <?php if ($locationMain === 'plugins') { ?>
-                                        <div class="wpacu-plugin-toggle-all">
-                                            <ul>
-                                                <li>"<?php _e('Unload on this page', 'wp-asset-clean-up'); ?>"</li>
-                                                <li>
-                                                    <a class="wpacu-plugin-check-all"
-                                                       data-wpacu-plugin="<?php echo $locationChild; ?>" href="#"><?php _e('Check All', 'wp-asset-clean-up'); ?></a>
-                                                    |
-                                                    <a class="wpacu-plugin-uncheck-all"
-                                                       data-wpacu-plugin="<?php echo $locationChild; ?>" href="#"><?php _e('Uncheck All', 'wp-asset-clean-up'); ?></a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    <?php } ?>
-                                </div>
-                            </div>
-                        <?php } ?>
-                            <table <?php
-                            if ($locationMain === 'plugins') {
-                                echo 'data-wpacu-plugin="' . $locationChild . '" ';
-                            }
+			                ksort( $values2 );
 
-                            if ($hideListOfAssetsOnly) {
-                                echo ' style="display: none;"';
-                            }
-                            ?>
-                                    class="wpacu_list_table wpacu_list_by_location wpacu_widefat wpacu_striped">
-                                <tbody>
-                                <?php
-                                if ($locationMain === 'plugins') {
-	                                do_action('wpacu_assets_plugin_notice_table_row', $locationChild);
+			                $assetRowsOutput = '';
+
+			                // Going through each asset from the plugin/theme
+			                foreach ( $values2 as $assetType => $assetRows ) {
+				                foreach ( $assetRows as $assetRow ) {
+					                $assetRowsOutput .= $assetRow . "\n";
+
+					                if ( $locationMain === 'plugins' ) {
+					                    if (strpos( $assetRow, 'wpacu_is_bulk_unloaded' ) !== false ) {
+						                    $totalBulkUnloadedAssetsPerPlugin ++;
+                                        }
+
+						                $totalPluginAssets ++;
+					                }
+
+					                $totalFilesArray[$locationMain] ++;
+				                }
+			                }
+
+			                if ( $locationChild !== 'none' ) {
+				                if ( $locationMain === 'plugins' ) {
+					                $locationChildText = \WpAssetCleanUp\Info::getPluginInfo( $locationChild, $allPlugins, $allActivePluginsIcons );
+
+					                // Show it if there is at least one available "Unload on this page"
+					                $showUnloadOnThisPageCheckUncheckAll = $totalPluginAssets !== $totalBulkUnloadedAssetsPerPlugin;
+
+					                // Show it if all the assets from the plugin are bulk unloaded
+					                $showLoadItOnThisPageCheckUncheckAll = $totalBulkUnloadedAssetsPerPlugin === $totalPluginAssets;
+				                } elseif ( $locationMain === 'themes' ) {
+					                $locationChildThemeArray = \WpAssetCleanUp\Info::getThemeInfo( $locationChild, $allThemes );
+					                $locationChildText = $locationChildThemeArray['output'];
+				                } else {
+					                $locationChildText = $locationChild;
+				                }
+
+                                $extraClassesToAppend = '';
+
+				                if ($locI === 1) {
+                                    $extraClassesToAppend .= ' wpacu-location-child-area-first ';
                                 }
 
-                                ksort($values2);
-
-                                foreach ($values2 as $assetType => $assetRows) {
-                                    foreach ($assetRows as $assetRow) {
-                                        echo $assetRow . "\n";
-                                    }
-                                }
+				                // PLUGIN LIST: VIEW THEIR ASSETS
+				                // EXPANDED (DEFAULT)
+                                if ( $locationMain === 'plugins' ) {
                                 ?>
-                                </tbody>
-                            </table>
-                        <?php
-	                        $locI++;
-                        }
-                    } else {
+                                        <div data-wpacu-plugin="<?php echo $locationChild; ?>"
+                                             class="wpacu-location-child-area wpacu-area-expanded <?php echo $extraClassesToAppend; ?>">
+                                            <div class="wpacu-area-title">
+                                                <?php echo $locationChildText; ?> <span style="font-weight: 200;">/</span> <span style="font-weight: 400;"><?php echo $totalPluginAssets; ?></span> files
+                                                <?php
+				                                include '_view-by-location/_plugin-list-expanded-actions.php';
+				                                ?>
+                                            </div>
+                                        </div>
+                                <?php
+                                } elseif ( $locationMain === 'themes' ) {
+                                    ?>
+                                    <div data-wpacu-plugin="<?php echo $locationChild; ?>"
+                                         class="wpacu-location-child-area wpacu-area-expanded <?php echo $extraClassesToAppend; ?>">
+                                        <div class="wpacu-area-title <?php if ($locationChildThemeArray['has_icon'] === true) { echo 'wpacu-theme-has-icon'; } ?>"><?php echo $locationChildText; ?></div>
+                                    </div>
+                                    <?php
+                                } else { // WordPress Core, Uploads, 3rd Party etc.
+                                    ?>
+                                    <div data-wpacu-plugin="<?php echo $locationChild; ?>"
+                                         class="wpacu-location-child-area wpacu-area-expanded <?php echo $extraClassesToAppend; ?>">
+                                        <div class="wpacu-area-title"><?php echo $locationChildText; ?></div>
+                                    </div>
+                                    <?php
+                                }
+			                }
+			                ?>
+
+                            <div class="wpacu-assets-table-list-wrap <?php if ( $locationMain === 'plugins' ) { ?> wpacu-plugin-assets-wrap <?php } ?>">
+                                <table <?php if ( $locationMain === 'plugins' ) {
+					                echo ' data-wpacu-plugin="' . $locationChild . '" ';
+				                } ?> class="wpacu_list_table wpacu_list_by_location wpacu_widefat wpacu_striped">
+                                    <tbody>
+                                        <?php
+                                        if ( $locationMain === 'plugins' ) {
+                                            do_action('wpacu_assets_plugin_notice_table_row', $locationChild);
+                                        }
+
+                                        echo $assetRowsOutput;
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+			                <?php
+			                $locationRowCount ++;
+		                }
+	                } else {
                         // There are no loaded CSS/JS
                         $showOxygenMsg = $locationMain === 'themes' && in_array('oxygen/functions.php', apply_filters('active_plugins', get_option('active_plugins')));
 
@@ -209,6 +255,14 @@ $listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
                     </div>
                 </div>
                 <?php
+                $locationMainOutput = ob_get_clean();
+                $locationMainOutput = str_replace(
+                    '{total_files_'.$locationMain.'}',
+                    $totalFilesArray[$locationMain],
+                    $locationMainOutput
+                );
+
+                echo $locationMainOutput;
             }
         }
     }

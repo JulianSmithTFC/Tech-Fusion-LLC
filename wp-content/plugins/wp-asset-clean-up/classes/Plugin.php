@@ -22,7 +22,13 @@ class Plugin
 	public function __construct()
 	{
 		register_activation_hook(WPACU_PLUGIN_FILE, array($this, 'whenActivated'));
+	}
 
+	/**
+	 *
+	 */
+	public function init()
+	{
 		// After fist time activation or in specific situations within the Dashboard
 		add_action('admin_init', array($this, 'adminInit'));
 
@@ -91,8 +97,8 @@ class Plugin
 		self::triggerFirstUsage();
 
 		/**
-		 * Note: Could be /wp-content/uploads/ if constant WPACU_CACHE_DIR was used
-		 *
+         * Note: Could be /wp-content/uploads/ if constant WPACU_CACHE_DIR was used
+         *
 		 * /wp-content/cache/asset-cleanup/
 		 * /wp-content/cache/asset-cleanup/index.php
 		 * /wp-content/cache/asset-cleanup/.htaccess
@@ -102,7 +108,7 @@ class Plugin
 		 * /wp-content/cache/asset-cleanup/css/index.php
 		 * /wp-content/cache/asset-cleanup/css/logged-in/
 		 * /wp-content/cache/asset-cleanup/css/logged-in/index.php
-
+         *
          * /wp-content/cache/asset-cleanup/js/
          * /wp-content/cache/asset-cleanup/js/item/
          * /wp-content/cache/asset-cleanup/js/index.php
@@ -142,51 +148,51 @@ class Plugin
 	            return;
             }
 
-			$emptyPhpFileContents = <<<TEXT
+		    $emptyPhpFileContents = <<<TEXT
 <?php
 // Silence is golden.
 TEXT;
 
-			$htAccessContents = <<<HTACCESS
+		    $htAccessContents = <<<HTACCESS
 <IfModule mod_autoindex.c>
 Options -Indexes
 </IfModule>
 HTACCESS;
 
-			if ( ! is_dir( $cacheDir ) ) {
-				@mkdir( $cacheDir, 0755, true );
-			}
+		    if ( ! is_dir( $cacheDir ) ) {
+			    @mkdir( $cacheDir, 0755, true );
+		    }
 
-			if ( ! is_file( $cacheDir . 'index.php' ) ) {
-				// /wp-content/cache/asset-cleanup/cache/{$assetType}/index.php
-				FileSystem::file_put_contents( $cacheDir . 'index.php', $emptyPhpFileContents );
-			}
+		    if ( ! is_file( $cacheDir . 'index.php' ) ) {
+			    // /wp-content/cache/asset-cleanup/cache/{$assetType}/index.php
+			    FileSystem::file_put_contents( $cacheDir . 'index.php', $emptyPhpFileContents );
+		    }
 
-			if ( ! is_dir( $cacheDir . 'logged-in' ) ) {
-				@mkdir( $cacheDir . 'logged-in', 0755 );
-			}
+		    if ( ! is_dir( $cacheDir . 'logged-in' ) ) {
+			    @mkdir( $cacheDir . 'logged-in', 0755 );
+		    }
 
 			if ( ! is_dir( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir ) ) {
 				@mkdir( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir, 0755 );
 			}
 
-			if ( ! is_file( $cacheDir . 'logged-in/index.php' ) ) {
-				// /wp-content/cache/asset-cleanup/cache/{$assetType}/logged-in/index.html
-				FileSystem::file_put_contents( $cacheDir . 'logged-in/index.php', $emptyPhpFileContents );
-			}
+		    if ( ! is_file( $cacheDir . 'logged-in/index.php' ) ) {
+			    // /wp-content/cache/asset-cleanup/cache/{$assetType}/logged-in/index.html
+			    FileSystem::file_put_contents( $cacheDir . 'logged-in/index.php', $emptyPhpFileContents );
+		    }
 
-			$htAccessFilePath = dirname( $cacheDir ) . '/.htaccess';
+		    $htAccessFilePath = dirname( $cacheDir ) . '/.htaccess';
 
-			if ( ! is_file( $htAccessFilePath ) ) {
-				// /wp-content/cache/asset-cleanup/.htaccess
-				FileSystem::file_put_contents( $htAccessFilePath, $htAccessContents );
-			}
+		    if ( ! is_file( $htAccessFilePath ) ) {
+			    // /wp-content/cache/asset-cleanup/.htaccess
+			    FileSystem::file_put_contents( $htAccessFilePath, $htAccessContents );
+		    }
 
-			if ( ! is_file( dirname( $cacheDir ) . '/index.php' ) ) {
-				// /wp-content/cache/asset-cleanup/index.php
-				FileSystem::file_put_contents( dirname( $cacheDir ) . '/index.php', $emptyPhpFileContents );
-			}
-		}
+		    if ( ! is_file( dirname( $cacheDir ) . '/index.php' ) ) {
+			    // /wp-content/cache/asset-cleanup/index.php
+			    FileSystem::file_put_contents( dirname( $cacheDir ) . '/index.php', $emptyPhpFileContents );
+		    }
+	    }
 
 		$storageDir = WP_CONTENT_DIR . OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir() . '_storage/';
 
@@ -209,16 +215,16 @@ HTACCESS;
 		if (strpos($_SERVER['REQUEST_URI'], '/plugins.php') !== false && get_transient(WPACU_PLUGIN_ID . '_redirect_after_activation')) {
 			// Remove it as only one redirect is needed (first time the plugin is activated)
 			delete_transient(WPACU_PLUGIN_ID . '_redirect_after_activation');
-			
+
 			// Do the 'first activation time' redirection
 			wp_redirect(admin_url('admin.php?page=' . WPACU_ADMIN_PAGE_ID_START));
 			exit();
 		}
 
-		$triggerFirstUsage = (strpos($_SERVER['REQUEST_URI'], '/plugins.php') !== false ||
-		                      strpos($_SERVER['REQUEST_URI'], '/plugin-install.php') !== false ||
-		                      strpos($_SERVER['REQUEST_URI'], '/options-general.php') !== false ||
-		                      strpos($_SERVER['REQUEST_URI'], '/update-core.php') !== false);
+        $triggerFirstUsage = (strpos($_SERVER['REQUEST_URI'], '/plugins.php') !== false ||
+                              strpos($_SERVER['REQUEST_URI'], '/plugin-install.php') !== false ||
+                              strpos($_SERVER['REQUEST_URI'], '/options-general.php') !== false ||
+                              strpos($_SERVER['REQUEST_URI'], '/update-core.php') !== false);
 
 		// No first usage timestamp set, yet? Set it now!
 		if ($triggerFirstUsage) {
@@ -259,4 +265,38 @@ HTACCESS;
 		}
 	}
 
-	}
+	/**
+     * This works like /?wpacu_no_load with a fundamental difference:
+     * It needs to be triggered through a very early 'init' action hook after all plugins are loaded, thus it can't be used in /early-triggers.php
+     * e.g. in situations when the page is an AMP one, prevent any changes to the HTML source by Asset CleanUp Pro
+     *
+	 * @return bool
+	 */
+	public static function preventAnyChanges()
+    {
+        // Only relevant if all the plugins are already loaded
+	    // and in the front-end view
+        if (! defined('WPACU_ALL_ACTIVE_PLUGINS_LOADED') || is_admin()) {
+            return false;
+        }
+
+        if (defined('WPACU_PREVENT_ANY_CHANGES')) {
+	        return WPACU_PREVENT_ANY_CHANGES;
+        }
+
+        // e.g. /amp/ - /amp? - /amp/? - /?amp or ending in /amp
+        $isAmpInRequestUri = ((isset($_SERVER['REQUEST_URI']) && (preg_match('/(\/amp$|\/amp\?)|(\/amp\/|\/amp\/\?)/', $_SERVER['REQUEST_URI']))) || (array_key_exists('amp', $_GET)));
+
+	    // Is it an AMP endpoint?
+	    if ( ($isAmpInRequestUri && Misc::isPluginActive('accelerated-mobile-pages/accelerated-moblie-pages.php')) // "AMP for WP – Accelerated Mobile Pages"
+             || ($isAmpInRequestUri && Misc::isPluginActive('amp/amp.php')) // "AMP – WordPress plugin"
+             || (function_exists('is_wp_amp') && Misc::isPluginActive('wp-amp/wp-amp.php') && is_wp_amp()) // "WP AMP — Accelerated Mobile Pages for WordPress and WooCommerce" (Premium plugin)
+        ) {
+	        define('WPACU_PREVENT_ANY_CHANGES', true);
+		    return true; // do not print anything on an AMP page
+	    }
+
+	    define('WPACU_PREVENT_ANY_CHANGES', false);
+	    return false;
+    }
+}

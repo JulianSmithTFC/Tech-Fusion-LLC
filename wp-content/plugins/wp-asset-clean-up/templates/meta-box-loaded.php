@@ -157,6 +157,7 @@ ob_start();
 ?>
 <label for="wpacu_assets_list_layout"><strong>Assets List Layout:</strong></label> <small>* any new change will take effect after you use the "Update" button</small>
 <p style="margin: 8px 0;"><select id="wpacu_assets_list_layout"
+                                  style="max-width: inherit;"
         name="wpacu_assets_list_layout">
     <option <?php if ($data['plugin_settings']['assets_list_layout'] === 'by-location') { echo 'selected="selected"'; } ?> value="by-location"><?php _e('All Styles &amp; Scripts', 'wp-asset-clean-up'); ?> &#10230; <?php _e('Grouped by location (themes, plugins, core &amp; external)', 'wp-asset-clean-up'); ?></option>
     <option <?php if ($data['plugin_settings']['assets_list_layout'] === 'by-position') { echo 'selected="selected"'; } ?> value="by-position"><?php _e('All Styles &amp; Scripts', 'wp-asset-clean-up'); ?> &#10230; <?php _e('Grouped by tag position: &lt;head&gt; &amp; &lt;body&gt;', 'wp-asset-clean-up'); ?></option>
@@ -196,4 +197,3 @@ if ($metaBoxLoadedFine) {
            name="wpacu_unload_assets_area_loaded"
            value="1" />
 <?php } ?>
-

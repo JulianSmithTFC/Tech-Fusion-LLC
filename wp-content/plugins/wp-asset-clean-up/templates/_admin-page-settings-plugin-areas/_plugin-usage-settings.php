@@ -41,28 +41,28 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
 
                     <div id="wpacu-settings-assets-retrieval-mode" <?php if (! ($data['dashboard_show'] == 1)) { echo 'style="display: none;"'; } ?>>
                         <ul id="wpacu-dom-get-type-selections">
-                            <li>
-                                <label for="wpacu_dom_get_type"><?php _e('Select a retrieval way', 'wp-asset-clean-up'); ?>:</label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input class="wpacu-dom-get-type-selection"
-                                           data-target="wpacu-dom-get-type-direct-info"
-                                           <?php if ($data['dom_get_type'] === 'direct') { ?>checked="checked"<?php } ?>
-                                           type="radio" name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[dom_get_type]"
-                                           value="direct" /> <?php _e('Direct', 'wp-asset-clean-up'); ?>
-                                </label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input class="wpacu-dom-get-type-selection"
-                                           data-target="wpacu-dom-get-type-wp-remote-post-info"
-                                           <?php if ($data['dom_get_type'] === 'wp_remote_post') { ?>checked="checked"<?php } ?>
-                                           type="radio" name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[dom_get_type]"
-                                           value="wp_remote_post" /> WP Remote Post
-                                </label>
-                            </li>
-                        </ul>
+                        <li>
+                            <label for="wpacu_dom_get_type"><?php _e('Select a retrieval way', 'wp-asset-clean-up'); ?>:</label>
+                        </li>
+                        <li>
+                            <label>
+                                <input class="wpacu-dom-get-type-selection"
+                                       data-target="wpacu-dom-get-type-direct-info"
+								       <?php if ($data['dom_get_type'] === 'direct') { ?>checked="checked"<?php } ?>
+                                       type="radio" name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[dom_get_type]"
+                                       value="direct" /> <?php _e('Direct', 'wp-asset-clean-up'); ?>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input class="wpacu-dom-get-type-selection"
+                                       data-target="wpacu-dom-get-type-wp-remote-post-info"
+								       <?php if ($data['dom_get_type'] === 'wp_remote_post') { ?>checked="checked"<?php } ?>
+                                       type="radio" name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[dom_get_type]"
+                                       value="wp_remote_post" /> WP Remote Post
+                            </label>
+                        </li>
+                    </ul>
 
                         <div class="wpacu-clearfix" style="height: 0;"></div>
 
@@ -168,6 +168,7 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
             <td>
                 <label>
                     <select id="wpacu_assets_list_layout"
+                            style="max-width: inherit;"
                             name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[assets_list_layout]">
                         <option <?php if ($data['assets_list_layout'] === 'by-location') { echo 'selected="selected"'; } ?> value="by-location"><?php _e('All Styles &amp; Scripts', 'wp-asset-clean-up'); ?> &#10230; <?php _e('Grouped by location (themes, plugins, core &amp; external)', 'wp-asset-clean-up'); ?></option>
                         <option <?php if ($data['assets_list_layout'] === 'by-position') { echo 'selected="selected"'; } ?> value="by-position"><?php _e('All Styles &amp; Scripts', 'wp-asset-clean-up'); ?> &#10230; <?php _e('Grouped by tag position: &lt;head&gt; &amp; &lt;body&gt;', 'wp-asset-clean-up'); ?></option>
@@ -218,7 +219,7 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
                 <label class="wpacu_switch">
                     <input id="wpacu_hide_from_admin_bar"
                            type="checkbox"
-			            <?php echo (($data['hide_from_admin_bar'] == 1) ? 'checked="checked"' : ''); ?>
+						<?php echo (($data['hide_from_admin_bar'] == 1) ? 'checked="checked"' : ''); ?>
                            name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[hide_from_admin_bar]"
                            value="1" /> <span class="wpacu_slider wpacu_round"></span> </label>
 
@@ -264,21 +265,21 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
             <td>
                 <ul class="assets_list_inline_code_status_choices">
                     <li>
+                        <label for="assets_list_inline_code_status_contracted">
+                            <input id="assets_list_inline_code_status_contracted"
+			                       <?php if ($data['assets_list_inline_code_status'] === 'contracted') { ?>checked="checked"<?php } ?>
+                                   type="radio"
+                                   name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[assets_list_inline_code_status]"
+                                   value="contracted"> <?php _e('Contracted', 'wp-asset-clean-up'); ?> (<?php _e('Default', 'wp-asset-clean-up'); ?>)
+                        </label>
+                    </li>
+                    <li>
                         <label for="assets_list_inline_code_status_expanded">
                             <input id="assets_list_inline_code_status_expanded"
 							       <?php if (! $data['assets_list_inline_code_status'] || $data['assets_list_inline_code_status'] === 'expanded') { ?>checked="checked"<?php } ?>
                                    type="radio"
                                    name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[assets_list_inline_code_status]"
-                                   value="expanded"> <?php _e('Expanded (Default)', 'wp-asset-clean-up'); ?>
-                        </label>
-                    </li>
-                    <li>
-                        <label for="assets_list_inline_code_status_contracted">
-                            <input id="assets_list_inline_code_status_contracted"
-							       <?php if ($data['assets_list_inline_code_status'] === 'contracted') { ?>checked="checked"<?php } ?>
-                                   type="radio"
-                                   name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[assets_list_inline_code_status]"
-                                   value="contracted"> <?php _e('Contracted', 'wp-asset-clean-up'); ?>
+                                   value="expanded"> <?php _e('Expanded', 'wp-asset-clean-up'); ?>
                         </label>
                     </li>
                 </ul>
@@ -350,7 +351,20 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
                            name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[allow_usage_tracking]"
                            value="1" /> <span class="wpacu_slider wpacu_round"></span> </label>
                 &nbsp;
-                Allow Asset CleanUp to anonymously track plugin usage in order to help us make the plugin better? No sensitive or personal data is collected. <span style="color: #004567;" class="dashicons dashicons-info"></span> <a id="wpacu-show-tracked-data-list-modal-target" href="#wpacu-show-tracked-data-list-modal">What kind of data will be sent for the tracking?</a>
+                Allow <?php echo WPACU_PLUGIN_TITLE; ?> to anonymously track plugin usage in order to help us make the plugin better? No sensitive or personal data is collected. <span style="color: #004567;" class="dashicons dashicons-info"></span> <a id="wpacu-show-tracked-data-list-modal-target" href="#wpacu-show-tracked-data-list-modal">What kind of data will be sent for the tracking?</a>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row">
+                <label for="wpacu_fetch_cached_files_details_from"><?php _e('Fetch assets\' caching information from:', 'wp-asset-clean-up'); ?></label>
+            </th>
+            <td>
+                <select id="wpacu_fetch_cached_files_details_from"
+                        name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[fetch_cached_files_details_from]">
+                    <option <?php if ($data['fetch_cached_files_details_from'] === 'db_disk') { ?>selected="selected"<?php } ?> value="db_disk">Database &amp; Disk (50% / 50%)</option>
+                    <option <?php if ($data['fetch_cached_files_details_from'] === 'db') { ?>selected="selected"<?php } ?> value="db">Database</option>
+                    <option <?php if ($data['fetch_cached_files_details_from'] === 'disk') { ?>selected="selected"<?php } ?> value="disk">Disk</option>
+                </select> &nbsp; <span style="color: #004567; vertical-align: middle;" class="dashicons dashicons-info"></span> <a style="vertical-align: middle;" id="wpacu-fetch-assets-details-location-modal-target" href="#wpacu-fetch-assets-details-location-modal">Read more</a>
             </td>
         </tr>
         <tr valign="top">
@@ -364,7 +378,7 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
                            style="width: 60px; margin-bottom: 10px;"
                            name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[clear_cached_files_after]"
                            value="<?php echo $data['clear_cached_files_after']; ?>" /> days <small>(setting the value to 0 will result in all the previously cached CSS/JS files to be deleted).</small>
-                <br />This is relevant only if any of the options from the following tabs are enabled: "Minify CSS & JS Files" &amp; "Combine CSS & JS Files"). When the caching is cleared, the previously cached CSS/JS files stored in <code><?php echo \WpAssetCleanUp\OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir(); ?></code> that are older than (X) days will be deleted as they are outdated and likely not referenced anymore in any source code (e.g. old cached pages, Google Search cached version etc.). <span style="color: #004567;" class="dashicons dashicons-info"></span> <a href="https://assetcleanup.com/docs/?p=237" target="_blank">Read more</a>
+                <br />This is relevant in case there are alterations made to the content of the CSS/JS files via minification, combination or any other settings that would require an update to the content of a file (e.g. apply "font-display" to @font-face in stylesheets). When the caching is cleared, the previously cached CSS/JS files stored in <code><?php echo \WpAssetCleanUp\OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir(); ?></code> that are older than (X) days will be deleted as they are outdated and likely not referenced anymore in any source code (e.g. old cached pages, Google Search cached version etc.). <span style="color: #004567;" class="dashicons dashicons-info"></span> <a href="https://assetcleanup.com/docs/?p=237" target="_blank">Read more</a>
             </td>
         </tr>
         <!-- [wpacu_lite] -->
@@ -418,6 +432,23 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
     </div>
 </div>
 
+<div id="wpacu-fetch-assets-details-location-modal" class="wpacu-modal" style="padding-top: 100px;">
+    <div class="wpacu-modal-content" style="max-width: 800px;">
+        <span class="wpacu-close">&times;</span>
+        <p>Any optimized files (e.g. via minification, combination) have their caching information (such as original location, new optimized location, version) stored in both the database and the disk by default to balance the usage of resources when you have loads of files to have their details fetched.</p>
+
+        <p>The contents are stored like in the following example:</p>
+        <p><code>{"source_uri":"\/wp-content\/plugins\/plugin-title-here\/assets\/style.css","optimize_uri":"\/wp-content\/uploads\/asset-cleanup\/css\/item\/handle-title-here-v10-8683e3d8975dab70c7f368d58203e66e70fb3e06.css","ver":10}</code></p>
+
+        <p>Once this information is retrieved, the file's original URL will be updated to match the optimized one for the file's content stored in <code><?php echo \WpAssetCleanUp\OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir(); ?></code>.</p>
+
+        <p>If, for instance, on a page, there are 19 CSS/JS files which are optimized &amp; cached, 10 would have their caching information fetched from the database while 9 from the disk in case you leave it to the default option which is <strong>Database &amp; Disk (50% / 50%)</strong>. If your website has a very large database and you will want to reduce the database queries, you could choose to get the information from the <strong>Disk</strong> instead.</p>
+
+        <p><strong>Note:</strong> If you are using a plugin such as WP Rocket, WP Fastest Cache or the caching system provided by your hosting company, then this fetching process would be significantly reduced as visitors will access static HTML pages read from the caching. Technically, no SQL queries should be made as the WordPress environment would not be loaded as it happens with a non-cached page (e.g. when you are logged-in and access the front-end pages).</p>
+    </div>
+</div>
+
+<!-- [wpacu_lite] -->
 <div id="wpacu-deactivate-modal-info" class="wpacu-modal" style="padding-top: 60px;">
     <div class="wpacu-modal-content" style="max-width: 650px;">
         <span class="wpacu-close">&times;</span>
@@ -428,3 +459,4 @@ foreach (\WpAssetCleanUp\MetaBoxes::$noMetaBoxesForPostTypes as $noMetaBoxesForP
         <img style="margin: 0 auto; width: 100%; max-width: 500px; display: table;" src="<?php echo WPACU_PLUGIN_URL. '/assets/images/wpacu-deactivate-modal.jpg'; ?>" alt="" />
     </div>
 </div>
+<!-- [/wpacu_lite] -->

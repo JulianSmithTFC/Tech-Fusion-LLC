@@ -1,6 +1,7 @@
 <?php
 namespace WpAssetCleanUp\OptimiseAssets;
 
+use WpAssetCleanUp\Plugin;
 use WpAssetCleanUp\Preloads;
 use WpAssetCleanUp\FileSystem;
 use WpAssetCleanUp\CleanUp;
@@ -15,6 +16,11 @@ use WpAssetCleanUp\Misc;
 class OptimizeCss
 {
 	/**
+	 *
+	 */
+	const MOVE_NOSCRIPT_TO_BODY_FOR_ASYNC_PRELOADS = '<meta name="wpacu-generator" content="ASSET CLEANUP NOSCRIPT FOR ASYNC PRELOADS">';
+
+	/**
 	 * @var float|int
 	 */
 	public static $cachedCssAssetsFileExpiresIn = 28800; // 8 hours in seconds (60 * 60 * 8)
@@ -26,6 +32,16 @@ class OptimizeCss
 	{
 		add_action('init', array($this, 'triggersAfterInit'));
 		add_action('wp_footer', array($this, 'prepareOptimizeList'), PHP_INT_MAX);
+
+		add_action('wp_footer', static function() {
+			if ( Plugin::preventAnyChanges() || Main::isTestModeActive() ) {
+				return;
+			}
+
+			echo self::MOVE_NOSCRIPT_TO_BODY_FOR_ASYNC_PRELOADS;
+		}, PHP_INT_MAX);
+
+		add_filter('wpacu_add_async_preloads_noscript', array($this, 'appendNoScriptAsyncPreloads'));
 	}
 
 	/**
@@ -86,7 +102,7 @@ class OptimizeCss
 	 */
 	public function prepareOptimizeList()
 	{
-		if (! self::isWorthCheckingForOptimization()) {
+		if ( ! self::isWorthCheckingForOptimization() || Plugin::preventAnyChanges() ) {
 			return;
 		}
 
@@ -183,8 +199,15 @@ class OptimizeCss
 
 		$transientName = 'wpacu_css_optimize_'.$handleDbStr;
 
-		if (! isset($GLOBALS['from_location_inc'])) { $GLOBALS['from_location_inc'] = 1; }
-		    $fromLocation = ($GLOBALS['from_location_inc'] % 2) ? 'db' : 'local';
+		if (Main::instance()->settings['fetch_cached_files_details_from'] === 'db_disk') {
+				    if ( ! isset( $GLOBALS['wpacu_from_location_inc'] ) ) {
+					    $GLOBALS['wpacu_from_location_inc'] = 1;
+				    }
+				    $fromLocation = ( $GLOBALS['wpacu_from_location_inc'] % 2 ) ? 'db' : 'disk';
+			    } else {
+				    $fromLocation = Main::instance()->settings['fetch_cached_files_details_from'];
+			    }
+
 			$savedValues = OptimizeCommon::getTransient($transientName, $fromLocation);
 
 			if ( $savedValues ) {
@@ -196,14 +219,20 @@ class OptimizeCss
 				} else {
 					$localPathToCssOptimized = str_replace( '//', '/', ABSPATH . $savedValuesArray['optimize_uri'] );
 
+					// Read the file from its caching (that makes the processing faster)
 					if ( isset( $savedValuesArray['source_uri'] ) && file_exists( $localPathToCssOptimized ) ) {
-						$GLOBALS['from_location_inc']++;
+						if (Main::instance()->settings['fetch_cached_files_details_from'] === 'db_disk') {
+							$GLOBALS['wpacu_from_location_inc']++;
+						}
 						return array(
 							$savedValuesArray['source_uri'],
 							$savedValuesArray['optimize_uri'],
 							$value->src
 						);
 					}
+
+					// If nothing valid gets returned above, make sure the transient gets deleted as it's re-added later on
+					OptimizeCommon::deleteTransient($transientName);
 				}
 			}
 		// Check if it starts without "/" or a protocol; e.g. "wp-content/theme/style.css"
@@ -334,7 +363,7 @@ class OptimizeCss
 			'ver'          => $dbVer
 		);
 
-		// Add / Re-add (with new version) transient
+		// Re-add transient
 		OptimizeCommon::setTransient($transientName, json_encode($saveValues));
 
 		return array(
@@ -407,6 +436,9 @@ class OptimizeCss
 
 		// Alter HTML Source for Google Fonts Optimization / Removal
 		$htmlSource = FontsGoogle::alterHtmlSource($htmlSource);
+
+		// NOSCRIPT fallbacks: Applies for Google Fonts (async) (Lite and Pro) and Preloads (Async in Pro version)
+		$htmlSource = apply_filters('wpacu_add_async_preloads_noscript', $htmlSource);
 
 		return $htmlSource;
 	}
@@ -500,7 +532,7 @@ class OptimizeCss
 
 				$alteredMatch = trim($alteredMatch);
 
-				if (! in_array($fullUrlMatch{4}, array("'", '"', '/', '.'))) {
+				if (! in_array($fullUrlMatch[4], array("'", '"', '/', '.'))) {
 					$alteredMatch = str_replace('url(', 'url(' . $appendBefore, $alteredMatch);
 					$alteredMatch = str_replace(array('")', '\')'), ')', $alteredMatch);
 				}
@@ -1048,6 +1080,36 @@ class OptimizeCss
 		}
 
 		return array('after' => $styleExtraAfter);
+	}
+
+	/**
+	 * @param $htmlSource
+	 *
+	 * @return mixed
+	 */
+	public function appendNoScriptAsyncPreloads($htmlSource)
+	{
+		preg_match_all('#<link[^>]*(data-wpacu-preload-it-async)[^>]*(>)#Umi', $htmlSource, $matchesSourcesFromTags, PREG_SET_ORDER);
+
+		$noScripts = '';
+
+		if (! empty($matchesSourcesFromTags)) {
+			foreach ($matchesSourcesFromTags as $matchedValues) {
+				$matchedTag = $matchedValues[0];
+
+				preg_match_all('#media=(["\'])' . '(.*)' . '(["\'])#Usmi', $matchedTag, $outputMatchesMedia);
+				$mediaAttrValue = isset($outputMatchesMedia[2][0]) ? trim($outputMatchesMedia[2][0], '"\'') : '';
+
+				preg_match_all('#href=(["\'])' . '(.*)' . '(["\'])#Usmi', $matchedTag, $outputMatchesMedia);
+				$hrefAttrValue = isset($outputMatchesMedia[2][0]) ? trim($outputMatchesMedia[2][0], '"\'') : '';
+
+				$noScripts .= '<noscript><link rel="stylesheet" href="'.$hrefAttrValue.'" media="'.$mediaAttrValue.'" /></noscript>'."\n";
+			}
+		}
+
+		$htmlSource = str_replace(self::MOVE_NOSCRIPT_TO_BODY_FOR_ASYNC_PRELOADS, $noScripts, $htmlSource);
+
+		return $htmlSource;
 	}
 
 	}

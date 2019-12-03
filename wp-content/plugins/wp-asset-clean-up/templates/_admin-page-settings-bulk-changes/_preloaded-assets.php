@@ -28,7 +28,7 @@ do_action('wpacu_admin_notices');
 	<?php if ($hasCssPreloads) { ?>
         <table style="width: 96%;" class="wp-list-table widefat fixed striped">
             <tr>
-                <td style="width: 280px;"><strong>Handle</strong></td>
+                <td style="min-width: 400px;"><strong>Handle</strong></td>
                 <td><strong>Actions</strong></td>
             </tr>
 
@@ -37,8 +37,13 @@ do_action('wpacu_admin_notices');
 
 			foreach ($assetsPreloaded['styles'] as $styleHandle => $preloadedStatus) {
 				?>
-                <tr class="wpacu_remove_preload_row">
-                    <td><strong style="color: green;"><?php echo $styleHandle; ?></strong></td>
+                <tr class="wpacu_bulk_change_row">
+                    <td>
+                        <?php
+	                    $data['assets_info'][ 'styles' ][ $styleHandle ] ['preloaded_status'] = $preloadedStatus;
+                        wpacuRenderHandleTd($styleHandle, 'styles', $data);
+                        ?>
+                    </td>
                     <td>
                         <label><input type="checkbox"
                                       class="wpacu_remove_preload"
@@ -62,7 +67,7 @@ do_action('wpacu_admin_notices');
 	<?php if ($hasJsPreloads) { ?>
         <table style="width: 96%;" class="wp-list-table widefat fixed striped">
             <tr>
-                <td style="width: 280px;"><strong>Handle</strong></td>
+                <td style="min-width: 400px;"><strong>Handle</strong></td>
                 <td><strong>Actions</strong></td>
             </tr>
 
@@ -71,8 +76,8 @@ do_action('wpacu_admin_notices');
 
 			foreach ($assetsPreloaded['scripts'] as $scriptHandle => $preloadedStatus) {
 				?>
-                <tr class="wpacu_remove_preload_row">
-                    <td><strong style="color: green;"><?php echo $scriptHandle; ?></strong></td>
+                <tr class="wpacu_bulk_change_row">
+                    <td><?php wpacuRenderHandleTd($scriptHandle, 'scripts', $data); ?></td>
                     <td>
                         <label><input type="checkbox"
                                       class="wpacu_remove_preload"
@@ -93,21 +98,26 @@ do_action('wpacu_admin_notices');
 		wp_nonce_field('wpacu_remove_preloaded_assets', 'wpacu_remove_preloaded_assets_nonce');
 	}
 	?>
-    <p style="margin: 20px 0 0 0;">
-        <input type="submit"
-               name="submit"
-		       <?php if (! $isUpdateable) { ?>disabled="disabled"<?php } ?>
-               class="wpacu-remove-preloads-btn button button-primary"
-               value="Remove preload for chosen CSS/JS" />
+    <div id="wpacu-update-button-area" class="no-left-margin">
+        <p style="margin: 20px 0 0 0;">
+            <input type="submit"
+                   name="submit"
+                   <?php if (! $isUpdateable) { ?>disabled="disabled"<?php } ?>
+                   class="wpacu-remove-preloads-btn button button-primary"
+                   value="Remove preload for chosen CSS/JS" />
 
-		<?php
-		if (! $isUpdateable) {
-			?>
-            &nbsp;&nbsp; <small>Note: As there are no preloaded CSS/JS, the update button is not enabled.</small>
-			<?php
-		}
-		?>
-    </p>
+            <?php
+            if (! $isUpdateable) {
+                ?>
+                &nbsp;&nbsp; <small>Note: As there are no preloaded CSS/JS, the update button is not enabled.</small>
+                <?php
+            }
+            ?>
+        </p>
+        <div id="wpacu-updating-settings" style="margin-left: 285px; top: 10px;">
+            <img src="<?php echo admin_url(); ?>/images/spinner.gif" align="top" width="20" height="20" alt="" />
+        </div>
+    </div>
 </form>
 
 <!-- Start Site-Wide Modal -->

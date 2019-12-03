@@ -136,6 +136,9 @@ class Settings
         // Allow Usage Tracking
         'allow_usage_tracking',
 
+        // Serve cached CSS/JS details from: Database or Disk
+        'fetch_cached_files_details_from',
+
         // Clear Cached CSS/JS files after (x) days
         'clear_cached_files_after',
 
@@ -463,9 +466,35 @@ class Settings
 	public function filterSettings($settings)
 	{
 		// /?wpacu_test_mode (will load the page with "Test Mode" enabled disregarding the value from the plugin's "Settings")
-		// For debugging purposes
+		// For debugging purposes (e.g. to make sure the HTML source is the same when a guest user accesses it as the one that is generated when the plugin is deactivated)
 		if (array_key_exists('wpacu_test_mode', $_GET)) {
 			$settings['test_mode'] = true;
+		}
+
+		if (array_key_exists('wpacu_skip_test_mode', $_GET)) {
+		    $settings['test_mode'] = false;
+        }
+
+		// /?wpacu_skip_inline_css
+        if (array_key_exists('wpacu_skip_inline_css_files', $_GET)) {
+	        $settings['inline_css_files'] = false;
+        }
+
+		// /?wpacu_skip_inline_js
+		if (array_key_exists('wpacu_skip_inline_js_files', $_GET)) {
+			$settings['inline_js_files'] = false;
+		}
+
+		if (isset($_GET['wpacu_settings']) && is_array($_GET['wpacu_settings']) && ! empty($_GET['wpacu_settings'])) {
+            foreach ($_GET['wpacu_settings'] as $settingKey => $settingValue) {
+                if ($settingValue === 'true') {
+	                $settingValue = true;
+                }
+	            if ($settingValue === 'false') {
+		            $settingValue = false;
+	            }
+                $settings[$settingKey] = $settingValue;
+            }
 		}
 
 		return $settings;

@@ -9,13 +9,13 @@ foreach ($data['all']['scripts'] as $obj) {
 
 	$active = (isset($data['current']['scripts']) && in_array($data['row']['obj']->handle, $data['current']['scripts']));
 
-    $data['row']['class'] = $active ? 'wpacu_not_load' : '';
+    $data['row']['class']   = $active ? 'wpacu_not_load' : '';
 	$data['row']['checked'] = $active ? 'checked="checked"' : '';
 
 	/*
 	 * $data['row']['is_global_rule'] is only used to apply a red background in the script's area to point out that the script is unloaded
 	*/
-	$data['row']['global_unloaded'] = $data['row']['is_post_type_unloaded'] = $data['row']['is_load_exception'] = $data['row']['is_global_rule'] = false;
+	$data['row']['global_unloaded'] = $data['row']['is_post_type_unloaded'] = $data['row']['is_load_exception_per_page'] = $data['row']['is_global_rule'] = false;
 
 	// Mark it as unloaded - Everywhere
 	if (in_array($data['row']['obj']->handle, $data['global_unload']['scripts']) && !$data['row']['class']) {
@@ -31,10 +31,10 @@ foreach ($data['all']['scripts'] as $obj) {
 		}
 	}
 
-	$isLoadException = in_array($data['row']['obj']->handle, $data['load_exceptions']['scripts']);
+	$isLoadExceptionPerPage = isset($data['load_exceptions']['scripts']) && in_array($data['row']['obj']->handle, $data['load_exceptions']['scripts']);
 
-	if ($isLoadException) {
-		$data['row']['is_load_exception'] = true;
+	if ($isLoadExceptionPerPage) {
+		$data['row']['is_load_exception_per_page'] = true;
 	} elseif ($data['row']['is_global_rule']) {
 		$data['row']['class'] .= ' wpacu_not_load';
 	}

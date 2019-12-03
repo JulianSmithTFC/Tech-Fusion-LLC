@@ -252,20 +252,42 @@ class Main
 		    add_action( 'wp_print_footer_scripts', array( $this, 'filterScripts' ), 1 );
 		    add_action( 'wp_print_footer_scripts', array( $this, 'filterStyles' ), 1 );
 
-            // Preloads
-            add_action('wp_head', static function() {
-                if (Main::instance()->preventAssetsSettings()) {
-                    return;
-                }
+		    // Preloads
+		    add_action('wp_head', static function() {
+			    if ( Plugin::preventAnyChanges() || self::isTestModeActive() ) {
+				    return;
+			    }
 
                 echo Preloads::DEL_STYLES_PRELOADS . Preloads::DEL_SCRIPTS_PRELOADS;
             }, 1);
 
 		    add_filter('style_loader_tag', static function($styleTag, $tagHandle) {
+			    // Alter for debugging purposes; triggers before anything else
+			    // e.g. you're working on a website and there is no Dashboard access and you want to determine the handle name
+			    // if the handle name is not showing up, then the LINK stylesheet has been hardcoded (not enqueued the WordPress way)
+			    if (array_key_exists('wpacu_show_handle_names', $_GET)) {
+				    $styleTag = str_replace('<link ', '<link data-wpacu-debug-style-handle=\'' . $tagHandle . '\' ', $styleTag);
+			    }
+
+		        if ( Plugin::preventAnyChanges() || self::isTestModeActive() ) {
+		            return $styleTag;
+                }
+
                 return str_replace('<link ', '<link data-wpacu-style-handle=\'' . $tagHandle . '\' ', $styleTag);
             }, 10, 2);
 
 		    add_filter('script_loader_tag', static function($scriptTag, $tagHandle) {
+		        // Alter for debugging purposes; triggers before anything else
+                // e.g. you're working on a website and there is no Dashboard access and you want to determine the handle name
+                // if the handle name is not showing up, then the SCRIPT has been hardcoded (not enqueued the WordPress way)
+		        if (array_key_exists('wpacu_show_handle_names', $_GET)) {
+			        $scriptTag = str_replace('<script ', '<script data-wpacu-debug-script-handle=\'' . $tagHandle . '\' ', $scriptTag);
+		        }
+
+			    if ( Plugin::preventAnyChanges() || self::isTestModeActive() ) {
+				    return $scriptTag;
+			    }
+
                 $scriptTag = str_replace('<script ', '<script data-wpacu-script-handle=\'' . $tagHandle . '\' ', $scriptTag);
 
                 if ($tagHandle === 'jquery-core') {
@@ -315,6 +337,8 @@ SQL;
         });
 
 	    $this->wpacuHtmlNoticeForAdmin();
+
+	    add_action('wp_ajax_' . WPACU_PLUGIN_ID . '_check_external_urls_for_status_code', array($this, 'ajaxCheckExternalUrlsForStatusCode'));
     }
 
 	/**
@@ -322,7 +346,7 @@ SQL;
 	 */
 	public function triggersAfterInit()
     {
-	    $wpacuSettingsClass = new Settings();
+        $wpacuSettingsClass = new Settings();
 	    $this->settings = $wpacuSettingsClass->getAll();
 
 	    if ($this->settings['dashboard_show'] && $this->settings['dom_get_type']) {
@@ -443,7 +467,14 @@ SQL;
             $this->loadExceptions = $this->getLoadExceptions($type, $this->currentPostId);
 
             // [wpacu_pro]
-            $this->loadExceptionsRegEx = self::getLoadRegExExceptions();
+            if ($this->frontendShow()) { // For Lite
+                // Only relevant if a downgrade was done from Pro to Lite
+                // and the admin will notice any RegEx data added
+	            // [wpacu_pro]
+	            $this->unloadsRegEx        = self::getRegExRules('unloads');
+	            $this->loadExceptionsRegEx = self::getRegExRules('load_exceptions');
+	            // [/wpacu_pro]
+            }
 	        // [wpacu_pro]
 
             }
@@ -532,9 +563,9 @@ SQL;
                 }
             }
 
-	        if (isset($this->wpAllScripts['queue']) && ! empty($this->wpAllScripts['queue'])) {
-		        $this->wpAllScripts['queue'] = array_unique( $this->wpAllScripts['queue'] );
-	        }
+            if (isset($this->wpAllScripts['queue']) && ! empty($this->wpAllScripts['queue'])) {
+	            $this->wpAllScripts['queue'] = array_unique( $this->wpAllScripts['queue'] );
+            }
         }
 
 	    // Nothing to unload
@@ -662,6 +693,7 @@ SQL;
         $allStyles = $this->wpStylesFilter($wp_styles, 'registered', $list);
 
 	    if ($allStyles !== null && ! empty($allStyles->registered)) {
+		    // Going through all the registered styles
 		    foreach ($allStyles->registered as $handle => $value) {
 			    // This could be triggered several times, check if the style already exists
 			    if (! isset($this->wpAllStyles['registered'][$handle])) {
@@ -720,50 +752,44 @@ SQL;
     {
         global $wp_styles, $oxygen_vsb_css_styles;
 
-        if ($listType === 'registered') {
-	        if (isset($oxygen_vsb_css_styles->registered) && is_object($oxygen_vsb_css_styles) && ! empty($oxygen_vsb_css_styles->registered)) {
-	            $stylesSpecialCases = array();
+        if ( ( $listType === 'registered' ) && isset( $oxygen_vsb_css_styles->registered ) && is_object( $oxygen_vsb_css_styles ) && ! empty( $oxygen_vsb_css_styles->registered ) ) {
+            $stylesSpecialCases = array();
 
-		        foreach ($oxygen_vsb_css_styles->registered as $oxygenHandle => $oxygenValue) {
-			        if (! array_key_exists($oxygenHandle, $wp_styles->registered)) {
-				        $wpStylesFilter->registered[$oxygenHandle] = $oxygenValue;
-				        $stylesSpecialCases[$oxygenHandle] = $oxygenValue->src;
-			        }
-		        }
-
-		        $unloadedSpecialCases = array();
-
-		        foreach ($unloadedList as $unloadedHandle) {
-		            if (array_key_exists($unloadedHandle, $stylesSpecialCases)) {
-			            $unloadedSpecialCases[$unloadedHandle] = $stylesSpecialCases[$unloadedHandle];
-                    }
+            foreach ($oxygen_vsb_css_styles->registered as $oxygenHandle => $oxygenValue) {
+                if (! array_key_exists($oxygenHandle, $wp_styles->registered)) {
+                    $wpStylesFilter->registered[$oxygenHandle] = $oxygenValue;
+                    $stylesSpecialCases[$oxygenHandle] = $oxygenValue->src;
                 }
+            }
 
-		        if (! empty($unloadedSpecialCases)) {
-			        // This will be later used in 'wp_loaded' below to extract the special styles
-			        echo self::$wpStylesSpecialDelimiters['start'] . json_encode($unloadedSpecialCases) . self::$wpStylesSpecialDelimiters['end'];
-		        }
-	        }
+            $unloadedSpecialCases = array();
+
+            foreach ($unloadedList as $unloadedHandle) {
+                if (array_key_exists($unloadedHandle, $stylesSpecialCases)) {
+                    $unloadedSpecialCases[$unloadedHandle] = $stylesSpecialCases[$unloadedHandle];
+                }
+            }
+
+            if (! empty($unloadedSpecialCases)) {
+                // This will be later used in 'wp_loaded' below to extract the special styles
+                echo self::$wpStylesSpecialDelimiters['start'] . json_encode($unloadedSpecialCases) . self::$wpStylesSpecialDelimiters['end'];
+            }
         }
 
-        if ($listType === 'done') {
-	        if (isset($oxygen_vsb_css_styles->done) && is_object($oxygen_vsb_css_styles)) {
-		        foreach ($oxygen_vsb_css_styles->done as $oxygenHandle) {
-			        if (! in_array($oxygenHandle, $wp_styles->done)) {
-				        $wpStylesFilter[] = $oxygenHandle;
-			        }
-		        }
-	        }
+        if ( ( $listType === 'done' ) && isset( $oxygen_vsb_css_styles->done ) && is_object( $oxygen_vsb_css_styles ) ) {
+            foreach ($oxygen_vsb_css_styles->done as $oxygenHandle) {
+                if (! in_array($oxygenHandle, $wp_styles->done)) {
+                    $wpStylesFilter[] = $oxygenHandle;
+                }
+            }
         }
 
-        if ($listType === 'queue') {
-	        if (isset($oxygen_vsb_css_styles->queue) && is_object($oxygen_vsb_css_styles)) {
-		        foreach ($oxygen_vsb_css_styles->queue as $oxygenHandle) {
-			        if (! in_array($oxygenHandle, $wp_styles->queue)) {
-				        $wpStylesFilter[] = $oxygenHandle;
-			        }
-		        }
-	        }
+        if ( ( $listType === 'queue' ) && isset( $oxygen_vsb_css_styles->queue ) && is_object( $oxygen_vsb_css_styles ) ) {
+            foreach ($oxygen_vsb_css_styles->queue as $oxygenHandle) {
+                if (! in_array($oxygenHandle, $wp_styles->queue)) {
+                    $wpStylesFilter[] = $oxygenHandle;
+                }
+            }
         }
 
 	    return $wpStylesFilter;
@@ -805,84 +831,74 @@ SQL;
     }
 
 	/**
-     * Alter CSS list marked for dequeue
-	 *
+     * Alter CSS/JS list marked for dequeue
+	 * @param $for
 	 * @return mixed
 	 */
-	public function filterCssOnTheFly()
+	public function unloadAssetOnTheFly($for)
     {
-	    $cssHandles = array();
+	    $assetType = ($for === 'css') ? 'styles' : 'scripts';
+	    $assetIndex = 'wpacu_unload_'.$for;
 
-        if (isset($_GET['wpacu_unload_css']) && $_GET['wpacu_unload_css']) {
-            $unloadCss = $_GET['wpacu_unload_css'];
+        if (! ($unloadAsset = Misc::getVar('get', $assetIndex))) {
+            return array();
+        }
 
-            if (strpos($unloadCss, ',') === false) {
-	            if (strpos($unloadCss, '[ignore-deps]') === false) {
-		            $unloadCss = str_replace('[ignore-deps]', '', $unloadCss);
-		            $this->ignoreChildrenHandlesOnTheFly['styles'][] = $unloadCss;
-	            }
+	    $assetHandles = array();
 
-	            $cssHandles[] = $unloadCss;
-            } else {
-                $unloadCssList = explode(',', $unloadCss);
+        if (strpos($unloadAsset, ',') === false) {
+            if (strpos($unloadAsset, '[ignore-deps]') === false) {
+                $unloadAsset = str_replace('[ignore-deps]', '', $unloadAsset);
+                $this->ignoreChildrenHandlesOnTheFly[$assetType][] = $unloadAsset;
+            }
 
-                foreach ($unloadCssList as $unloadCss) {
-                    $unloadCss = trim($unloadCss);
+            $assetHandles[] = $unloadAsset;
+        } else {
+            foreach (explode(',', $unloadAsset) as $unloadAsset) {
+                $unloadAsset = trim($unloadAsset);
 
-                    if ($unloadCss) {
-	                    if (strpos($unloadCss, '[ignore-deps]') === false) {
-		                    $unloadCss = str_replace('[ignore-deps]', '', $unloadCss);
-		                    $this->ignoreChildrenHandlesOnTheFly['styles'][] = $unloadCss;
-	                    }
-
-	                    $cssHandles[] = $unloadCss;
+                if ($unloadAsset) {
+                    if (strpos($unloadAsset, '[ignore-deps]') === false) {
+                        $unloadAsset = str_replace('[ignore-deps]', '', $unloadAsset);
+                        $this->ignoreChildrenHandlesOnTheFly[$assetType][] = $unloadAsset;
                     }
+
+                    $assetHandles[] = $unloadAsset;
                 }
             }
         }
 
-        return $cssHandles;
+        return $assetHandles;
     }
 
 	/**
-     * Alter JS list marked for dequeue
+	 * @param $exceptionsList
 	 *
 	 * @return mixed
 	 */
-	public function filterJsOnTheFly()
-	{
-		$jsHandles = array();
+	public function makeLoadExceptionOnTheFly($exceptionsList)
+    {
+        foreach (array('css', 'js') as $assetExt) {
+            $assetKey = ($assetExt === 'css') ? 'styles' : 'scripts';
+            $indexToCheck = 'wpacu_load_'.$assetExt;
 
-		if (isset($_GET['wpacu_unload_js']) && $_GET['wpacu_unload_js']) {
-			$unloadJs = $_GET['wpacu_unload_js'];
+            if ( ! ($loadAsset = Misc::getVar('get', $indexToCheck)) ) {
+                if (strpos($loadAsset, ',') === false) {
+                    $exceptionsList[$assetKey][] = $loadAsset;
+                } else {
+                    foreach (explode(',', $loadAsset) as $loadAsset) {
+                        $loadAsset = trim($loadAsset);
 
-			if (strpos($unloadJs, ',') === false) {
-			    if (strpos($unloadJs, '[ignore-deps]') !== false) {
-				    $unloadJs = str_replace('[ignore-deps]', '', $unloadJs);
-				    $this->ignoreChildrenHandlesOnTheFly['scripts'][] = $unloadJs;
+                        if ($loadAsset) {
+                            $exceptionsList[$assetKey][] = $loadAsset;
+                        }
+                    }
                 }
+            }
+	    }
 
-				$jsHandles[] = $unloadJs;
-			} else {
-				$unloadCssList = explode(',', $unloadJs);
-
-				foreach ($unloadCssList as $unloadJs) {
-					$unloadJs = trim($unloadJs);
-
-					if ($unloadJs) {
-						if (strpos($unloadJs, '[ignore-deps]') !== false) {
-							$unloadJs = str_replace('[ignore-deps]', '', $unloadJs);
-							$this->ignoreChildrenHandlesOnTheFly['scripts'][] = $unloadJs;
-						}
-
-						$jsHandles[] = $unloadJs;
-					}
-				}
-			}
-		}
-
-        return $jsHandles;
-	}
+        return $exceptionsList;
+    }
 
     /**
      * @param string $type
@@ -923,7 +939,7 @@ SQL;
             );
         }
 
-	    if ($exceptionsListJson) {
+        if ($exceptionsListJson) {
             $exceptionsList = json_decode($exceptionsListJson, true);
 
             if (Misc::jsonLastError() !== JSON_ERROR_NONE) {
@@ -931,21 +947,32 @@ SQL;
             }
         }
 
-        return $exceptionsList;
+        // Any exceptions on the fly added for debugging purposes? Make sure to grab them
+        $exceptionsList = $this->makeLoadExceptionOnTheFly($exceptionsList);
+
+	    return $exceptionsList;
     }
 
 	/**
-	 * Load style/script (based on the handle) for URLs matching a specified RegEx
-	 *
+     * Case 1: UNLOAD style/script (based on the handle) for URLs matching a specified RegExp
+	 * Case 2: LOAD (make an exception) style/script (based on the handle) for URLs matching a specified RegExp
+     *
+	 * @param $for
+     *
 	 * @return array
 	 */
-	public static function getLoadRegexExceptions()
+	public static function getRegExRules($for = 'load_exceptions')
 	{
 		$regExes = array('styles' => array(), 'scripts' => array());
 
 		$regExDbListJson = get_option(WPACU_PLUGIN_ID . '_global_data');
 
-		$globalKey = 'load_regex'; // DB Key (how it's saved in the database)
+		// DB Key (how it's saved in the database)
+		if ($for === 'load_exceptions') {
+			$globalKey = 'load_regex';
+		} else {
+			$globalKey = 'unload_regex';
+        }
 
 		if ($regExDbListJson) {
 			$regExDbList = @json_decode($regExDbListJson, true);
@@ -955,7 +982,7 @@ SQL;
 				return $regExes;
 			}
 
-			// Are Load Exception RegExes?
+			// Are there any load exceptions / unload RegExes?
 			foreach (array('styles', 'scripts') as $assetKey) {
 				if ( isset( $regExDbList[$assetKey][$globalKey] ) && ! empty( $regExDbList[$assetKey][$globalKey] ) ) {
 					$regExes[$assetKey] = $regExDbList[$assetKey][$globalKey];
@@ -1189,6 +1216,10 @@ SQL;
      */
     public function printScriptsStyles()
     {
+        if (Plugin::preventAnyChanges()) {
+            return;
+        }
+
     	// Not for WordPress AJAX calls
         if (self::$domGetType === 'direct' && defined('DOING_AJAX') && DOING_AJAX) {
             return;
@@ -1399,7 +1430,7 @@ SQL;
 
 	        $data['wpacu_page_just_updated'] = false;
 
-	        if (get_transient('wpacu_page_just_updated')) {
+	        if (isset($_GET['wpacu_time'], $_GET['nocache']) && get_transient('wpacu_page_just_updated')) {
 		        $data['wpacu_page_just_updated'] = true;
 		        delete_transient('wpacu_page_just_updated');
 	        }
@@ -1478,10 +1509,6 @@ SQL;
 
 	        $data['preloads']     = Preloads::instance()->getPreloads();
             $data['handle_notes'] = $this->getHandleNotes();
-
-            // [wpacu_pro]
-            $data['handle_load_regex'] = self::getLoadRegexExceptions();
-            // [/wpacu_pro]
 
 	        $data['ignore_child'] = $this->getIgnoreChildren();
 
@@ -1650,11 +1677,6 @@ SQL;
 
         $data['load_exceptions'] = $this->getLoadExceptions($type, $postId);
 
-	    // [wpacu_pro]
-        // e.g. Load it if URL matches chosen RegEx
-	    $data['handle_load_regex'] = self::getLoadRegexExceptions();
-	    // [/wpacu_pro]
-
         $data['total_styles']  = ! empty($data['all']['styles']) ? count($data['all']['styles']) : 0;
         $data['total_scripts'] = ! empty($data['all']['scripts']) ? count($data['all']['scripts']) : 0;
 
@@ -1667,6 +1689,31 @@ SQL;
         $this->parseTemplate('meta-box-loaded', $data, true);
 
         exit;
+    }
+
+	/**
+	 * @return false|mixed|string|void
+	 */
+	public function ajaxCheckExternalUrlsForStatusCode()
+    {
+	    if (! isset($_POST['action'], $_POST['wpacu_check_urls']) || ! Menu::userCanManageAssets()) {
+		    return;
+	    }
+
+	    $checkUrls = explode('-at-wpacu-at-', $_POST['wpacu_check_urls']);
+	    $checkUrls = array_filter(array_unique($checkUrls));
+
+	    foreach ($checkUrls as $index => $checkUrl) {
+		    $response = wp_remote_get($checkUrl);
+
+		    // Remove 200 OK ones as the other ones will remain for highlighting
+		    if (wp_remote_retrieve_response_code($response) === 200) {
+			    unset($checkUrls[$index]);
+            }
+        }
+
+	    echo json_encode($checkUrls);
+	    exit();
     }
 
 	/**
@@ -1754,17 +1801,17 @@ SQL;
 		                $data['all']['styles'][$key]->baseUrl = $localSrc['base_url'];
 	                }
 
-                    $part = str_replace(
-                        array(
-                            'http://',
-                            'https://',
-                            '//'
-                        ),
-                        '',
-                        $obj->src
-                    );
+	                $part = str_replace(
+		                array(
+			                'http://',
+			                'https://',
+			                '//'
+		                ),
+		                '',
+		                $obj->src
+	                );
 
-                    $parts     = explode('/', $part);
+	                $parts     = explode('/', $part);
 	                $parentDir = isset($parts[1]) ? $parts[1] : '';
 
                     // Loaded from WordPress directories (Core)
@@ -1886,7 +1933,7 @@ SQL;
 	    $assetsRemovedDecoded = json_decode($this->assetsRemoved, ARRAY_A);
 
 	    if (Misc::getVar('get', 'wpacu_unload_css')) {
-            $cssOnTheFlyList = $this->filterCssOnTheFly();
+            $cssOnTheFlyList = $this->unloadAssetOnTheFly('css');
 
             if (! empty($cssOnTheFlyList)) {
                 foreach ($cssOnTheFlyList as $cssHandle) {
@@ -1896,7 +1943,7 @@ SQL;
         }
 
 	    if (Misc::getVar('get', 'wpacu_unload_js')) {
-		    $jsOnTheFlyList = $this->filterJsOnTheFly();
+		    $jsOnTheFlyList = $this->unloadAssetOnTheFly('js');
 
 		    if (! empty($jsOnTheFlyList)) {
 			    foreach ($jsOnTheFlyList as $jsHandle) {
@@ -2121,8 +2168,8 @@ SQL;
 		}
 
 		// Is test mode enabled? Unload assets ONLY for the admin
-		if (isset($this->settings['test_mode']) && $this->settings['test_mode'] && ! Menu::userCanManageAssets()) {
-			return true; // visitors (non-logged in) will view the pages with all the assets loaded as if the plugin (Asset CleanUp) is not enabled
+		if (self::isTestModeActive()) {
+			return true; // visitors (non-logged in) will view the pages with all the assets loaded
 		}
 
 		if (defined('WPACU_CURRENT_PAGE_ID') && WPACU_CURRENT_PAGE_ID > 0) {
@@ -2135,6 +2182,28 @@ SQL;
 
 		return false;
 	}
+
+	/**
+	 * @param array $settings
+	 *
+	 * @return bool
+	 */
+	public static function isTestModeActive($settings = array())
+    {
+        if (defined('WPACU_IS_TEST_MODE_ACTIVE')) {
+            return WPACU_IS_TEST_MODE_ACTIVE;
+        }
+
+        if (! $settings) {
+            $settings = self::instance()->settings;
+        }
+
+        $wpacuIsTestModeActive = isset($settings['test_mode']) && $settings['test_mode'] && ! Menu::userCanManageAssets();
+
+        define('WPACU_IS_TEST_MODE_ACTIVE', $wpacuIsTestModeActive);
+
+        return $wpacuIsTestModeActive;
+    }
 
 	/**
 	 * @return bool
@@ -2176,8 +2245,8 @@ SQL;
 	 */
 	public function wpacuHtmlNoticeForAdmin()
 	{
-		add_action('wp_footer', function() {
-			if (! apply_filters('wpacu_show_admin_console_notice', true)) {
+		add_action('wp_footer', static function() {
+			if (! apply_filters('wpacu_show_admin_console_notice', true) || Plugin::preventAnyChanges()) {
 				return;
 			}
 

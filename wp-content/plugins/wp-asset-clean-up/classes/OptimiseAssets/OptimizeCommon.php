@@ -60,6 +60,11 @@ class OptimizeCommon
 			return self::alterHtmlSource($htmlSource);
 		}, 1, 1);
 
+		// In case HTML Minify is enabled in W3 Total Cache, make sure any settings (e.g. JS combine) in Asset CleanUp will be applied
+		add_filter('w3tc_minify_before', static function ($htmlSource) {
+			return self::alterHtmlSource($htmlSource);
+		}, 1, 1);
+
 		// Is Smart Slider 3 used?
 		add_action('init', static function() {
 			if (defined('NEXTEND_SMARTSLIDER_3_URL_PATH') && class_exists('\N2WordpressAssetInjector') && method_exists('\N2WordpressAssetInjector', 'platformRenderEnd')) {
@@ -96,6 +101,10 @@ class OptimizeCommon
 	 */
 	public static function alterHtmlSource($htmlSource)
 	{
+		if (Plugin::preventAnyChanges()) {
+			return $htmlSource;
+		}
+
 		$htmlSource = apply_filters('wpacu_html_source_before_optimization', $htmlSource);
 
 		$htmlSource = OptimizeCss::alterHtmlSource($htmlSource);
@@ -919,7 +928,7 @@ SQL;
 		$contents = '';
 
 		// Local record
-		if ($fromLocation === 'local') {
+		if ($fromLocation === 'disk') {
 			$dirToFilename = WP_CONTENT_DIR . self::getRelPathPluginCacheDir() . '_storage/'.self::$optimizedSingleFilesDir.'/';
 			$assetsFile = $dirToFilename . $transient.'.json';
 
@@ -927,7 +936,7 @@ SQL;
 				$contents = trim(FileSystem::file_get_contents($assetsFile));
 
 				if (! $contents) {
-					// Empty file? Something weird, use the MySQL record as a fallback
+					// Empty file? Something weird, use the MySQL record as a fallback (if any)
 					return get_transient($transient);
 				}
 			}

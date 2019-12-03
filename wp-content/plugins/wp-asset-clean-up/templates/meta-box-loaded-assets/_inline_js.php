@@ -22,7 +22,7 @@ if (! isset($data)) {
                 assetsListContent.style.maxHeight = null;
             } else {
                 //assetsListContent.style.maxHeight = assetsListContent.scrollHeight + "px";
-                assetsListContent.style.maxHeight = "100%";
+                assetsListContent.style.maxHeight = 'inherit';
             }
         });
     }
@@ -39,7 +39,7 @@ if (! isset($data)) {
             if (assetInlineCodeContent.style.maxHeight) {
                 assetInlineCodeContent.style.maxHeight = null;
             } else {
-                assetInlineCodeContent.style.maxHeight = assetInlineCodeContent.scrollHeight + "px";
+                assetInlineCodeContent.style.maxHeight = assetInlineCodeContent.scrollHeight + 'px';
             }
         });
     }
@@ -69,7 +69,7 @@ if (! isset($data)) {
             wpacuContentLinks[wpacuI].classList.add('wpacu-assets-collapsible-active');
             assetsListContent = wpacuContentLinks[wpacuI].nextElementSibling;
             //assetsListContent.style.maxHeight = assetsListContent.scrollHeight + 'px';
-            assetsListContent.style.maxHeight = '100%';
+            assetsListContent.style.maxHeight = 'inherit';
             assetsListContent.classList.remove('wpacu-open');
         }
     }

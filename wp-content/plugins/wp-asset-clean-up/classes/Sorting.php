@@ -131,7 +131,7 @@ class Sorting
 						} else {
 							$relSrc = str_replace($pluginsUrl, '', $src);
 
-							if ($relSrc{0} === '/') {
+							if ($relSrc[0] === '/') {
 								$relSrc = substr($relSrc, 1);
 							}
 
